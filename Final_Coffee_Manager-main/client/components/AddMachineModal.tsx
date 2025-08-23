@@ -81,11 +81,15 @@ export default function AddMachineModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('🔥 AddMachineModal: Form submitted!', { formData, selectedOffice });
+
     // Use selectedOffice if provided, otherwise use form data
     const finalFormData = {
       ...formData,
       office: selectedOffice || formData.office,
     };
+
+    console.log('🚀 AddMachineModal: Calling onSubmit with:', finalFormData);
     onSubmit(finalFormData);
   };
 
@@ -117,6 +121,18 @@ export default function AddMachineModal({
   };
 
   const isFormValid = formData.name && formData.location && (formData.office || selectedOffice);
+
+  // Debug form validation
+  console.log('📋 Form validation:', {
+    name: formData.name,
+    location: formData.location,
+    office: formData.office,
+    selectedOffice,
+    isFormValid,
+    nameValid: !!formData.name,
+    locationValid: !!formData.location,
+    officeValid: !!(formData.office || selectedOffice)
+  });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -342,10 +358,18 @@ export default function AddMachineModal({
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={!isFormValid || isLoading}
               className="bg-gradient-to-r from-primary to-primary/80"
+              onClick={(e) => {
+                console.log('🖱️ Add Machine button clicked!', {
+                  isFormValid,
+                  isLoading,
+                  disabled: !isFormValid || isLoading
+                });
+                // Don't prevent default here, let form submission handle it
+              }}
             >
               {isLoading ? 'Adding Machine...' : 'Add Machine'}
             </Button>
