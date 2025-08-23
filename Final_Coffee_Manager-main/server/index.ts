@@ -6,6 +6,7 @@ import {
   getMachines,
   getMachine,
   getMachineByMachineId,
+  createMachine,
   updateMachine,
   updateSupplies,
   getLocations,
@@ -41,6 +42,7 @@ export function createServer() {
   app.get("/api/machines/maintenance-needed", getMaintenanceNeededMachines);
   app.get("/api/machines/machine/:machineId", getMachineByMachineId);
   app.get("/api/machines", getMachines);
+  app.post("/api/machines", createMachine);
   app.get("/api/machines/:id", getMachine);
   app.put("/api/machines/:id", updateMachine);
   app.put("/api/machines/:id/supplies", updateSupplies);
