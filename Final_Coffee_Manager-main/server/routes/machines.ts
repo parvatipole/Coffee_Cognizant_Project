@@ -285,10 +285,19 @@ export const updateSupplies: RequestHandler = (req, res) => {
     return res.status(404).json({ error: "Machine not found" });
   }
 
+  // Normalize supplies data
+  const supplies = req.body.supplies || {};
+  const normalizedSupplies = {
+    water: supplies.water || existingMachine.supplies?.water || 0,
+    milk: supplies.milk || existingMachine.supplies?.milk || 0,
+    coffee: supplies.coffee || supplies.coffeeBeans || existingMachine.supplies?.coffee || 0,
+    sugar: supplies.sugar || existingMachine.supplies?.sugar || 0,
+  };
+
   // Update supplies
   const updatedMachine = {
     ...existingMachine,
-    supplies: { ...existingMachine.supplies, ...req.body.supplies },
+    supplies: normalizedSupplies,
   };
   machinesStorage.set(id, updatedMachine);
   saveMachines(machinesStorage);
