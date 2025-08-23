@@ -92,8 +92,16 @@ export default function MachineManagement({
   const [selectedSupply, setSelectedSupply] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Get machine data by ID (searches all offices)
+  // Get machine data by ID (searches localStorage first, then static data)
   const getMachineDataById = (id: string): MachineData | null => {
+    // First check localStorage for updated data
+    const localMachine = dataManager.getMachine(id);
+    if (localMachine) {
+      console.log('📦 Found machine in localStorage:', localMachine);
+      return localMachine;
+    }
+
+    // Fallback to static data
     const allMachines = getAllMachinesData();
     return allMachines.find((m) => m.id === id) || null;
   };
@@ -329,6 +337,14 @@ export default function MachineManagement({
   const [machineData, setMachineData] = useState<MachineData>(() => {
     // If machineId is provided, get specific machine
     if (machineId) {
+      // First check localStorage for saved/updated data
+      const localMachine = dataManager.getMachine(machineId);
+      if (localMachine) {
+        console.log('🎯 Using localStorage machine data:', localMachine);
+        return localMachine;
+      }
+
+      // Fallback to static data
       const machine = getMachineDataById(machineId);
       if (machine) return machine;
     }
@@ -339,24 +355,26 @@ export default function MachineManagement({
   // Load machine data from API/localStorage on component mount
   useEffect(() => {
     const loadMachineData = async () => {
+      if (!machineId) return;
+
       try {
-        // First try to load from localStorage
-        const localData = dataManager.getMachine(machineId!);
+        // First try to load from localStorage (this has priority)
+        const localData = dataManager.getMachine(machineId);
         if (localData) {
-          console.log('✅ Loading machine data from localStorage:', localData);
+          console.log('✅ Refreshing machine data from localStorage:', localData);
           setMachineData(localData);
           if (localData.alerts) {
             setAlerts(localData.alerts);
           }
-          // Return early if we have local data - this ensures newly created machines display correctly
-          return;
+          return; // Don't override with API data if we have local updates
         }
 
-        // Only try API if no local data exists
+        // Only sync with API if no local data exists (for existing machines)
         try {
-          const apiData = await apiClient.getMachineByMachineId(machineId!);
+          const apiData = await apiClient.getMachineByMachineId(machineId);
           if (apiData) {
             const mappedData = dataManager.mapBackendToFrontend(apiData);
+            console.log('📡 Loaded machine data from API:', mappedData);
             setMachineData(mappedData);
             dataManager.saveMachine(mappedData);
 
@@ -365,17 +383,15 @@ export default function MachineManagement({
             }
           }
         } catch (apiError) {
-          console.log('API unavailable, keeping existing data:', apiError.message);
+          console.log('API unavailable, using existing data:', apiError.message);
         }
       } catch (error) {
         console.error("Failed to load machine data:", error);
-        // Keep using static data as fallback
       }
     };
 
-    if (machineId) {
-      loadMachineData();
-    }
+    // Reload data when machineId changes
+    loadMachineData();
   }, [machineId]);
 
   const canEdit = user?.role === "technician";
@@ -518,39 +534,43 @@ export default function MachineManagement({
   };
 
   const handleSupplyRefill = async (supplyKey: string, amount: number) => {
+    const currentValue = machineData.supplies[supplyKey as keyof typeof machineData.supplies] || 0;
+    const newValue = Math.min(100, currentValue + amount);
+
     const updatedSupplies = {
       ...machineData.supplies,
-      [supplyKey]: Math.min(
-        100,
-        machineData.supplies[supplyKey as keyof typeof machineData.supplies] +
-          amount,
-      ),
-    } as any;
+      [supplyKey]: newValue,
+    };
 
     // Ensure backend key `coffee` stays in sync when updating coffeeBeans
-    const normalizedUpdatedSupplies =
-      supplyKey === 'coffeeBeans'
-        ? { ...updatedSupplies, coffee: updatedSupplies.coffeeBeans }
-        : updatedSupplies;
+    if (supplyKey === 'coffeeBeans') {
+      updatedSupplies.coffee = newValue;
+    }
+
+    console.log(`🔄 Refilling ${supplyKey}: ${currentValue}% → ${newValue}%`);
+
+    // Create updated machine data
+    const updatedMachineData = {
+      ...machineData,
+      supplies: updatedSupplies,
+    };
 
     // Update local state immediately for responsive UI
-    setMachineData((prev) => ({
-      ...prev,
-      supplies: normalizedUpdatedSupplies,
-    }));
+    setMachineData(updatedMachineData);
 
-    // Save to localStorage immediately (keeps both keys in sync)
-    dataManager.updateMachineSupplies(machineData.id, normalizedUpdatedSupplies);
+    // Save entire machine to localStorage to ensure persistence
+    dataManager.saveMachine(updatedMachineData);
+    console.log('💾 Saved updated machine to localStorage');
 
     try {
       // Save to backend using backend supply keys
-      const backendSupplies = dataManager.mapFrontendToBackend({ supplies: normalizedUpdatedSupplies }).supplies;
+      const backendSupplies = dataManager.mapFrontendToBackend({ supplies: updatedSupplies }).supplies;
       await apiClient.updateSupplies(machineData.id, {
         supplies: backendSupplies,
       });
-      console.log('Supplies updated in backend successfully');
+      console.log('📡 Supplies updated in backend successfully');
     } catch (error) {
-      console.log('Backend unavailable, saved supplies locally:', (error as any).message);
+      console.log('⚠️ Backend unavailable, saved supplies locally only:', (error as any).message);
     }
   };
 
