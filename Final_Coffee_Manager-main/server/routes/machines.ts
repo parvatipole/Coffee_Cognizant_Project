@@ -233,9 +233,30 @@ export const updateMachine: RequestHandler = (req, res) => {
   const { id } = req.params;
   const existingMachine = machinesStorage.get(id);
 
+  // Normalize frontend data
+  const normalizedData = { ...req.body };
+  if (normalizedData.supplies) {
+    const supplies = normalizedData.supplies;
+    normalizedData.supplies = {
+      water: supplies.water || 0,
+      milk: supplies.milk || 0,
+      coffee: supplies.coffee || supplies.coffeeBeans || 0,
+      sugar: supplies.sugar || 0,
+    };
+  }
+
   if (!existingMachine) {
     // If machine doesn't exist, create it (for backward compatibility)
-    const newMachine = { ...req.body, id };
+    const newMachine = {
+      ...normalizedData,
+      id,
+      powerStatus: normalizedData.powerStatus || "online",
+      lastPowerUpdate: normalizedData.lastPowerUpdate || new Date().toISOString().slice(0, 19).replace('T', ' '),
+      lastMaintenance: normalizedData.lastMaintenance || new Date().toISOString().slice(0, 10),
+      nextMaintenance: normalizedData.nextMaintenance || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+      usage: normalizedData.usage || { dailyCups: 0, weeklyCups: 0 },
+      alerts: normalizedData.alerts || [],
+    };
     machinesStorage.set(id, newMachine);
     saveMachines(machinesStorage);
 
@@ -246,7 +267,7 @@ export const updateMachine: RequestHandler = (req, res) => {
   }
 
   // Update the machine data
-  const updatedMachine = { ...existingMachine, ...req.body, id };
+  const updatedMachine = { ...existingMachine, ...normalizedData, id };
   machinesStorage.set(id, updatedMachine);
   saveMachines(machinesStorage);
 
