@@ -147,17 +147,6 @@ export default function AddMachineModal({
     }
   }, [isOpen, selectedOffice]);
 
-  // Only log validation issues when form is invalid
-  useEffect(() => {
-    if (!isFormValid && (formData.name || formData.location || formData.office)) {
-      console.log('📋 Form validation issues:', {
-        nameValid: !!formData.name.trim(),
-        locationValid: !!formData.location.trim(),
-        officeValid: !!(formData.office.trim() || selectedOffice),
-      });
-    }
-  }, [formData.name, formData.location, formData.office, selectedOffice, isFormValid]);
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
