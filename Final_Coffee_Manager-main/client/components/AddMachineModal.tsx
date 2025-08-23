@@ -119,7 +119,10 @@ export default function AddMachineModal({
             Add New Coffee Machine
           </DialogTitle>
           <DialogDescription>
-            Configure a new coffee machine for {selectedOffice}. Fill in all the required details.
+            {selectedOffice
+              ? `Configure a new coffee machine for ${selectedOffice}. Fill in all the required details.`
+              : 'Configure a new coffee machine. Fill in all the required details.'
+            }
           </DialogDescription>
         </DialogHeader>
 
@@ -143,16 +146,33 @@ export default function AddMachineModal({
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="office">Office *</Label>
-                <Input
-                  id="office"
-                  value={formData.office}
-                  onChange={(e) => handleInputChange('office', e.target.value)}
-                  placeholder="e.g., Hinjewadi IT Park"
-                  required
-                />
-              </div>
+              {!selectedOffice && (
+                <div className="space-y-2">
+                  <Label htmlFor="office">Office *</Label>
+                  <Input
+                    id="office"
+                    value={formData.office}
+                    onChange={(e) => handleInputChange('office', e.target.value)}
+                    placeholder="e.g., Hinjewadi IT Park"
+                    required
+                  />
+                </div>
+              )}
+
+              {selectedOffice && (
+                <div className="space-y-2">
+                  <Label htmlFor="office">Office</Label>
+                  <Input
+                    id="office"
+                    value={selectedOffice}
+                    disabled
+                    className="bg-muted text-muted-foreground"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Machine will be added to {selectedOffice}
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
