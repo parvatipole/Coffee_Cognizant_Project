@@ -38,12 +38,34 @@ const STORAGE_KEYS = {
   LAST_SYNC: 'coffee_last_sync',
 } as const;
 
+// Normalize supplies to ensure both coffeeBeans (UI) and coffee (backend) are in sync
+const normalizeSupplies = (supplies: any) => {
+  const coffeeBeans = supplies?.coffeeBeans ?? supplies?.coffee ?? 0;
+  return {
+    water: supplies?.water ?? 0,
+    milk: supplies?.milk ?? 0,
+    sugar: supplies?.sugar ?? 0,
+    coffeeBeans,
+    coffee: coffeeBeans,
+  } as any;
+};
+
+const normalizeMachine = (machine: any) => {
+  if (!machine) return machine;
+  return {
+    ...machine,
+    supplies: normalizeSupplies(machine.supplies || {}),
+  };
+};
+
 export const dataManager = {
   // Save machine data to localStorage
   saveMachine: (machine: MachineData): void => {
     const existingMachines = dataManager.getAllMachines();
     const updatedMachines = existingMachines.filter(m => m.id !== machine.id);
-    updatedMachines.push(machine);
+    // Ensure normalized supplies before saving
+    const normalized = normalizeMachine(machine);
+    updatedMachines.push(normalized);
     
     localStorage.setItem(STORAGE_KEYS.MACHINES, JSON.stringify(updatedMachines));
     localStorage.setItem(STORAGE_KEYS.LAST_SYNC, new Date().toISOString());
@@ -53,7 +75,8 @@ export const dataManager = {
   getAllMachines: (): MachineData[] => {
     try {
       const stored = localStorage.getItem(STORAGE_KEYS.MACHINES);
-      return stored ? JSON.parse(stored) : [];
+      const parsed = stored ? JSON.parse(stored) : [];
+      return Array.isArray(parsed) ? parsed.map(normalizeMachine) : [];
     } catch (error) {
       console.warn('Failed to load machines from localStorage:', error);
       return [];
@@ -63,7 +86,8 @@ export const dataManager = {
   // Get machine by ID
   getMachine: (id: string): MachineData | null => {
     const machines = dataManager.getAllMachines();
-    return machines.find(m => m.id === id || m.machineId === id) || null;
+    const found = machines.find(m => m.id === id || m.machineId === id) || null;
+    return found ? normalizeMachine(found) : null;
   },
 
   // Update machine supplies
@@ -72,10 +96,11 @@ export const dataManager = {
     const machineIndex = machines.findIndex(m => m.id === id || m.machineId === id);
     
     if (machineIndex !== -1) {
-      machines[machineIndex].supplies = {
+      const mergedSupplies = normalizeSupplies({
         ...machines[machineIndex].supplies,
         ...supplies,
-      };
+      });
+      machines[machineIndex].supplies = mergedSupplies as any;
       localStorage.setItem(STORAGE_KEYS.MACHINES, JSON.stringify(machines));
     }
   },
@@ -86,10 +111,11 @@ export const dataManager = {
     const machineIndex = machines.findIndex(m => m.id === id || m.machineId === id);
     
     if (machineIndex !== -1) {
-      machines[machineIndex] = {
+      const updated = normalizeMachine({
         ...machines[machineIndex],
         ...updates,
-      };
+      });
+      machines[machineIndex] = updated;
       localStorage.setItem(STORAGE_KEYS.MACHINES, JSON.stringify(machines));
     }
   },
@@ -115,26 +141,23 @@ export const dataManager = {
 
   // Map backend data format to frontend format
   mapBackendToFrontend: (backendData: any): MachineData => {
+    const normalizedSupplies = normalizeSupplies(backendData.supplies || {});
     return {
       ...backendData,
-      supplies: {
-        water: backendData.supplies?.water || 0,
-        milk: backendData.supplies?.milk || 0,
-        coffee: backendData.supplies?.coffee || backendData.supplies?.coffeeBeans || 0,
-        sugar: backendData.supplies?.sugar || 0,
-      },
+      supplies: normalizedSupplies,
     };
   },
 
   // Map frontend data format to backend format
   mapFrontendToBackend: (frontendData: any): any => {
+    const supplies = normalizeSupplies(frontendData.supplies || {});
     return {
       ...frontendData,
       supplies: {
-        water: frontendData.supplies?.water || 0,
-        milk: frontendData.supplies?.milk || 0,
-        coffee: frontendData.supplies?.coffee || frontendData.supplies?.coffeeBeans || 0,
-        sugar: frontendData.supplies?.sugar || 0,
+        water: supplies.water,
+        milk: supplies.milk,
+        sugar: supplies.sugar,
+        coffee: supplies.coffee, // backend expects `coffee`
       },
     };
   },

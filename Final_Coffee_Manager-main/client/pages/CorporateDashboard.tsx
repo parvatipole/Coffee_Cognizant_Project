@@ -552,7 +552,7 @@ export default function CorporateDashboard() {
     setSelectedLocation(location);
     setSelectedOffice("");
     setSelectedMachine("");
-    const locationData = corporateLocations.find((l) => l.name === location);
+    const locationData = locations.find((l) => l.name === location);
     setOffices(locationData?.offices || []);
     setCurrentStep(1);
   };
@@ -606,6 +606,7 @@ export default function CorporateDashboard() {
           water: machineData.supplies.water,
           milk: machineData.supplies.milk,
           coffee: machineData.supplies.coffeeBeans, // Fix field mapping
+          coffeeBeans: machineData.supplies.coffeeBeans, // Keep UI-friendly key too
           sugar: machineData.supplies.sugar,
         },
         maintenance: machineData.maintenance,
