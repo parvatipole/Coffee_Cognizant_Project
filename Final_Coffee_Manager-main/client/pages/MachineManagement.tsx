@@ -519,25 +519,32 @@ export default function MachineManagement({
         machineData.supplies[supplyKey as keyof typeof machineData.supplies] +
           amount,
       ),
-    };
+    } as any;
+
+    // Ensure backend key `coffee` stays in sync when updating coffeeBeans
+    const normalizedUpdatedSupplies =
+      supplyKey === 'coffeeBeans'
+        ? { ...updatedSupplies, coffee: updatedSupplies.coffeeBeans }
+        : updatedSupplies;
 
     // Update local state immediately for responsive UI
     setMachineData((prev) => ({
       ...prev,
-      supplies: updatedSupplies,
+      supplies: normalizedUpdatedSupplies,
     }));
 
-    // Save to localStorage immediately
-    dataManager.updateMachineSupplies(machineData.id, updatedSupplies);
+    // Save to localStorage immediately (keeps both keys in sync)
+    dataManager.updateMachineSupplies(machineData.id, normalizedUpdatedSupplies);
 
     try {
-      // Save to backend
+      // Save to backend using backend supply keys
+      const backendSupplies = dataManager.mapFrontendToBackend({ supplies: normalizedUpdatedSupplies }).supplies;
       await apiClient.updateSupplies(machineData.id, {
-        supplies: updatedSupplies,
+        supplies: backendSupplies,
       });
       console.log('Supplies updated in backend successfully');
     } catch (error) {
-      console.log('Backend unavailable, saved supplies locally:', error.message);
+      console.log('Backend unavailable, saved supplies locally:', (error as any).message);
     }
   };
 
