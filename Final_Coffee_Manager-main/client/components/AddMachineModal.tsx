@@ -59,6 +59,7 @@ export default function AddMachineModal({
 }: AddMachineModalProps) {
   // Suppress third-party script errors (like video element errors)
   useErrorSuppression();
+
   const [formData, setFormData] = useState<MachineFormData>({
     name: '',
     location: '',
@@ -122,8 +123,34 @@ export default function AddMachineModal({
 
   const isFormValid = formData.name.trim() && formData.location.trim() && (formData.office.trim() || selectedOffice);
 
+  // Reset form when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      console.log('🔄 Modal opened - resetting form with selectedOffice:', selectedOffice);
+      setFormData({
+        name: '',
+        location: '',
+        office: selectedOffice || '',
+        status: 'operational',
+        supplies: {
+          water: 100,
+          milk: 100,
+          coffeeBeans: 100,
+          sugar: 100,
+        },
+        maintenance: {
+          filterStatus: 'good',
+          cleaningStatus: 'clean',
+          temperature: 92,
+          pressure: 15,
+        },
+        notes: '',
+      });
+    }
+  }, [isOpen, selectedOffice]);
+
   // Debug form validation only when form changes
-  React.useEffect(() => {
+  useEffect(() => {
     console.log('📋 Form validation state:', {
       name: `"${formData.name}"`,
       location: `"${formData.location}"`,
