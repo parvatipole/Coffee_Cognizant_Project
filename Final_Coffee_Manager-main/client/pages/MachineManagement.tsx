@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useErrorSuppression } from "@/hooks/useErrorSuppression";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -85,6 +86,9 @@ interface MachineManagementProps {
 export default function MachineManagement({
   officePath,
 }: MachineManagementProps = {}) {
+  // Suppress third-party script errors (like video element errors)
+  useErrorSuppression();
+
   const { user } = useAuth();
   const { machineId } = useParams<{ machineId?: string }>();
   const [isEditing, setIsEditing] = useState(false);
