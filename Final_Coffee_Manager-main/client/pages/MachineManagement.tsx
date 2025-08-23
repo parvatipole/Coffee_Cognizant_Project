@@ -472,9 +472,6 @@ export default function MachineManagement({
     }
   };
 
-  // Debug supplies data to track the issue
-  console.log('🔍 Supplies data for machine:', machineData.id, machineData.supplies);
-
   const supplies = [
     {
       name: "Water",
