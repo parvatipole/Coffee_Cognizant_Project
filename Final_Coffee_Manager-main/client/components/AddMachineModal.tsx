@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -120,19 +120,19 @@ export default function AddMachineModal({
     }));
   };
 
-  const isFormValid = formData.name && formData.location && (formData.office || selectedOffice);
+  const isFormValid = formData.name.trim() && formData.location.trim() && (formData.office.trim() || selectedOffice);
 
-  // Debug form validation
-  console.log('📋 Form validation:', {
-    name: formData.name,
-    location: formData.location,
-    office: formData.office,
-    selectedOffice,
-    isFormValid,
-    nameValid: !!formData.name,
-    locationValid: !!formData.location,
-    officeValid: !!(formData.office || selectedOffice)
-  });
+  // Debug form validation only when form changes
+  React.useEffect(() => {
+    console.log('📋 Form validation state:', {
+      name: `"${formData.name}"`,
+      location: `"${formData.location}"`,
+      office: `"${formData.office}"`,
+      selectedOffice: `"${selectedOffice || ''}"`,
+      isFormValid,
+      buttonDisabled: !isFormValid || isLoading
+    });
+  }, [formData.name, formData.location, formData.office, selectedOffice, isFormValid, isLoading]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
