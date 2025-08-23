@@ -108,7 +108,7 @@ export default function AddMachineModal({
     }));
   };
 
-  const isFormValid = formData.name && formData.location && formData.office;
+  const isFormValid = formData.name && formData.location && (formData.office || selectedOffice);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
