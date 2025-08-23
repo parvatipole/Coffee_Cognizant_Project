@@ -692,6 +692,72 @@ export default function OfficeOverview() {
 
   const officeStats = getOverallOfficeStatus();
 
+  // Handle adding new machine
+  const handleAddMachine = async (machineData: any) => {
+    setIsAddingMachine(true);
+
+    try {
+      // Generate unique machine ID based on office
+      const officePrefix = officeName === "Hinjewadi IT Park" ? "HIJ" :
+                          officeName === "Koregaon Park Office" ? "KOR" :
+                          officeName === "Viman Nagar Tech Hub" ? "VIM" :
+                          officeName === "Bandra Kurla Complex" ? "BKC" :
+                          officeName === "Lower Parel Financial" ? "LOW" :
+                          officeName === "Andheri Tech Center" ? "AND" : "NEW";
+
+      const machineNumber = (machines.length + 1).toString().padStart(3, '0');
+      const newMachineId = `${officePrefix}-${machineNumber}`;
+
+      const newMachine = {
+        id: newMachineId,
+        machineId: newMachineId,
+        name: machineData.name,
+        location: machineData.location,
+        status: machineData.status,
+        office: officeName, // Auto-set from current office context
+        powerStatus: "online" as const,
+        lastPowerUpdate: new Date().toISOString().slice(0, 19).replace('T', ' '),
+        lastMaintenance: new Date().toISOString().slice(0, 10),
+        nextMaintenance: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+        supplies: {
+          water: machineData.supplies.water,
+          milk: machineData.supplies.milk,
+          coffeeBeans: machineData.supplies.coffeeBeans,
+          sugar: machineData.supplies.sugar,
+        },
+        maintenance: machineData.maintenance,
+        usage: {
+          dailyCups: 0,
+          weeklyCups: 0,
+        },
+        notes: machineData.notes || "New machine installation",
+      };
+
+      // Save to localStorage immediately
+      dataManager.saveMachine(newMachine);
+
+      // Try to save to backend
+      try {
+        const backendData = dataManager.mapFrontendToBackend(newMachine);
+        await apiClient.createMachine(backendData);
+        console.log('Machine saved to backend successfully');
+      } catch (error) {
+        console.log('Backend unavailable, saved locally only:', error.message);
+      }
+
+      // Update local machines list
+      setMachines(prev => [...prev, newMachine]);
+      setIsAddMachineModalOpen(false);
+
+      console.log('Machine added successfully:', newMachine);
+
+    } catch (error) {
+      console.error('Failed to add machine:', error);
+    } finally {
+      setIsAddingMachine(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
       {/* Header */}
@@ -954,12 +1020,27 @@ export default function OfficeOverview() {
             <CardContent className="text-center py-8">
               <Coffee className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">No machines found</h3>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground mb-4">
                 No coffee machines are currently registered for {officeName}.
               </p>
+              {canEdit && (
+                <Button onClick={() => setIsAddMachineModalOpen(true)} className="gap-2">
+                  <Plus className="w-4 h-4" />
+                  Add First Machine
+                </Button>
+              )}
             </CardContent>
           </Card>
         )}
+
+        {/* Add Machine Modal */}
+        <AddMachineModal
+          isOpen={isAddMachineModalOpen}
+          onClose={() => setIsAddMachineModalOpen(false)}
+          onSubmit={handleAddMachine}
+          selectedOffice={officeName}
+          isLoading={isAddingMachine}
+        />
       </div>
     </div>
   );
