@@ -194,8 +194,32 @@ export const createMachine: RequestHandler = (req, res) => {
     return res.status(409).json({ error: "Machine with this ID already exists" });
   }
 
-  // Create new machine
-  const newMachine = { ...req.body, id };
+  // Normalize frontend data to backend format
+  const normalizedData = { ...req.body };
+
+  // Handle supplies field mapping (frontend uses coffeeBeans, backend uses coffee)
+  if (normalizedData.supplies) {
+    const supplies = normalizedData.supplies;
+    normalizedData.supplies = {
+      water: supplies.water || 0,
+      milk: supplies.milk || 0,
+      coffee: supplies.coffee || supplies.coffeeBeans || 0,
+      sugar: supplies.sugar || 0,
+    };
+  }
+
+  // Ensure required fields have defaults
+  const newMachine = {
+    ...normalizedData,
+    id,
+    powerStatus: normalizedData.powerStatus || "online",
+    lastPowerUpdate: normalizedData.lastPowerUpdate || new Date().toISOString().slice(0, 19).replace('T', ' '),
+    lastMaintenance: normalizedData.lastMaintenance || new Date().toISOString().slice(0, 10),
+    nextMaintenance: normalizedData.nextMaintenance || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+    usage: normalizedData.usage || { dailyCups: 0, weeklyCups: 0 },
+    alerts: normalizedData.alerts || [],
+  };
+
   machinesStorage.set(id, newMachine);
   saveMachines(machinesStorage);
 
