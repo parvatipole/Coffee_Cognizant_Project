@@ -456,6 +456,9 @@ export default function MachineManagement({
     }
   };
 
+  // Debug supplies data to track the issue
+  console.log('🔍 Supplies data for machine:', machineData.id, machineData.supplies);
+
   const supplies = [
     {
       name: "Water",
@@ -476,7 +479,7 @@ export default function MachineManagement({
     {
       name: "Coffee Beans",
       key: "coffeeBeans",
-      current: machineData.supplies.coffeeBeans,
+      current: machineData.supplies.coffeeBeans || machineData.supplies.coffee || 0,
       icon: <Coffee className="w-4 h-4" />,
       unit: "kg",
       cost: 120,
