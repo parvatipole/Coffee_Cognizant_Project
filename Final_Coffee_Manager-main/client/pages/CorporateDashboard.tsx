@@ -1049,6 +1049,29 @@ export default function CorporateDashboard() {
 
               {/* Machine Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Add Machine Card - Admin Only */}
+                {user?.role === "admin" && (
+                  <Card
+                    className="cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl border-2 border-dashed border-primary/30 hover:border-primary bg-gradient-to-br from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/20"
+                    onClick={() => setIsAddMachineModalOpen(true)}
+                  >
+                    <CardContent className="flex flex-col items-center justify-center h-full min-h-[300px] space-y-4">
+                      <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center">
+                        <Plus className="w-8 h-8 text-primary" />
+                      </div>
+                      <div className="text-center space-y-2">
+                        <h3 className="text-lg font-semibold text-primary">Add New Machine</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Install a new coffee machine in {selectedOffice}
+                        </p>
+                      </div>
+                      <div className="text-xs text-muted-foreground bg-primary/10 px-3 py-1 rounded-full">
+                        Admin Only
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
                 {machines.map((machine, index) => (
                   <Card
                     key={machine.id}
