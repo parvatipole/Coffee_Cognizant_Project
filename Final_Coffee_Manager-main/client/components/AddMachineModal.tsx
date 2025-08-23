@@ -7,7 +7,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useErrorSuppression } from '@/hooks/useErrorSuppression';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -57,9 +56,6 @@ export default function AddMachineModal({
   selectedOffice,
   isLoading = false,
 }: AddMachineModalProps) {
-  // Suppress third-party script errors (like video element errors)
-  useErrorSuppression();
-
   const [formData, setFormData] = useState<MachineFormData>({
     name: '',
     location: '',
