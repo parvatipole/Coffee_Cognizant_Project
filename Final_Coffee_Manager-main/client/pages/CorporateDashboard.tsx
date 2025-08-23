@@ -579,7 +579,7 @@ export default function CorporateDashboard() {
 
       // Save to backend API first
       try {
-        await apiClient.updateMachine(newMachine.id, newMachine);
+        await apiClient.createMachine(newMachine);
         console.log('Machine saved to backend successfully');
       } catch (error) {
         console.log('Backend unavailable, saving locally only:', error.message);
