@@ -40,7 +40,9 @@ import {
   Target,
   Cpu,
   Droplets,
+  Plus,
 } from "lucide-react";
+import AddMachineModal from "@/components/AddMachineModal";
 
 interface NavigationStep {
   id: string;
