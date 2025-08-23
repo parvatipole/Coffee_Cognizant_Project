@@ -107,6 +107,10 @@ export default function CorporateDashboard() {
     Map<string, MachineStatusUpdate>
   >(new Map());
 
+  // Add Machine Modal state
+  const [isAddMachineModalOpen, setIsAddMachineModalOpen] = useState(false);
+  const [isAddingMachine, setIsAddingMachine] = useState(false);
+
   // Streamlined 3-step process: Location → Office → Machine
   const steps: NavigationStep[] = [
     {
