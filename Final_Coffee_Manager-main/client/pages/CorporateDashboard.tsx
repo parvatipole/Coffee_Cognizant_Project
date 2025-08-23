@@ -505,9 +505,47 @@ export default function CorporateDashboard() {
     setRealtimeUpdates((prev) => new Map(prev.set(update.machineId, update)));
   });
 
-  // Load corporate data
+  // Load corporate data and merge with localStorage data
   useEffect(() => {
-    setLocations(corporateLocations);
+    const loadData = () => {
+      // Load base corporate locations
+      let loadedLocations = [...corporateLocations];
+
+      // Load machines from localStorage and merge them
+      const storedMachines = dataManager.getAllMachines();
+
+      if (storedMachines.length > 0) {
+        console.log(`Loaded ${storedMachines.length} machines from localStorage`);
+
+        // Group stored machines by office
+        const machinesByOffice = storedMachines.reduce((acc, machine) => {
+          const office = machine.office || 'Unknown Office';
+          if (!acc[office]) acc[office] = [];
+          acc[office].push(machine);
+          return acc;
+        }, {} as Record<string, any[]>);
+
+        // Merge stored machines into the locations structure
+        loadedLocations = loadedLocations.map(location => ({
+          ...location,
+          offices: location.offices.map(office => {
+            const storedMachinesForOffice = machinesByOffice[office.name] || [];
+            // Filter out duplicates by ID
+            const existingIds = office.machines.map(m => m.id);
+            const newMachines = storedMachinesForOffice.filter(m => !existingIds.includes(m.id));
+
+            return {
+              ...office,
+              machines: [...office.machines, ...newMachines]
+            };
+          })
+        }));
+      }
+
+      setLocations(loadedLocations);
+    };
+
+    loadData();
   }, []);
 
   const handleLocationSelect = (location: string) => {
