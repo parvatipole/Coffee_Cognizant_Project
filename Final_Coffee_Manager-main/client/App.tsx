@@ -1,5 +1,6 @@
 import "./global.css";
 import "./lib/errorHandler"; // Global error handling for demo mode
+import "./lib/globalErrorHandler"; // Global error handler for third-party script errors
 import "./lib/rechartsSuppress"; // Suppress Recharts defaultProps warnings
 
 import { Toaster } from "@/components/ui/toaster";
