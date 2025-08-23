@@ -129,7 +129,6 @@ export default function AddMachineModal({
   // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
-      console.log('🔄 Modal opened - resetting form with selectedOffice:', selectedOffice);
       setFormData({
         name: '',
         location: '',
