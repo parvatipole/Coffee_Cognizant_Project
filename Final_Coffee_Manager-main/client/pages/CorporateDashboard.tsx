@@ -1233,6 +1233,15 @@ export default function CorporateDashboard() {
           )}
         </div>
       </main>
+
+      {/* Add Machine Modal */}
+      <AddMachineModal
+        isOpen={isAddMachineModalOpen}
+        onClose={() => setIsAddMachineModalOpen(false)}
+        onSubmit={handleAddMachine}
+        selectedOffice={selectedOffice}
+        isLoading={isAddingMachine}
+      />
     </div>
   );
 }
