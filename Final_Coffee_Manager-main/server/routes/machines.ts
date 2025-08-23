@@ -147,6 +147,7 @@ const initializeData = () => {
     sampleMachines.forEach((machine) => {
       machinesStorage.set(machine.id, machine);
     });
+    saveMachines(machinesStorage);
   }
 };
 
@@ -196,6 +197,7 @@ export const createMachine: RequestHandler = (req, res) => {
   // Create new machine
   const newMachine = { ...req.body, id };
   machinesStorage.set(id, newMachine);
+  saveMachines(machinesStorage);
 
   res.status(201).json({
     message: "Machine created successfully",
@@ -211,6 +213,7 @@ export const updateMachine: RequestHandler = (req, res) => {
     // If machine doesn't exist, create it (for backward compatibility)
     const newMachine = { ...req.body, id };
     machinesStorage.set(id, newMachine);
+    saveMachines(machinesStorage);
 
     return res.status(201).json({
       message: "Machine created successfully",
@@ -221,6 +224,7 @@ export const updateMachine: RequestHandler = (req, res) => {
   // Update the machine data
   const updatedMachine = { ...existingMachine, ...req.body, id };
   machinesStorage.set(id, updatedMachine);
+  saveMachines(machinesStorage);
 
   res.json({
     message: "Machine updated successfully",
@@ -242,6 +246,7 @@ export const updateSupplies: RequestHandler = (req, res) => {
     supplies: { ...existingMachine.supplies, ...req.body.supplies },
   };
   machinesStorage.set(id, updatedMachine);
+  saveMachines(machinesStorage);
 
   res.json({ message: "Supplies updated successfully" });
 };
