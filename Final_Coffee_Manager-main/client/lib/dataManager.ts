@@ -17,6 +17,7 @@ interface MachineData {
     water: number;
     milk: number;
     coffee: number;
+    coffeeBeans: number;
     sugar: number;
   };
   maintenance: {
@@ -45,7 +46,7 @@ const normalizeSupplies = (supplies: any) => {
     water: supplies?.water ?? 0,
     milk: supplies?.milk ?? 0,
     sugar: supplies?.sugar ?? 0,
-    coffeeBeans,
+    coffeeBeans: coffeeBeans,
     coffee: coffeeBeans,
   } as any;
 };
