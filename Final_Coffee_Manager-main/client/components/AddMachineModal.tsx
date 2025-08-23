@@ -81,7 +81,12 @@ export default function AddMachineModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Use selectedOffice if provided, otherwise use form data\n    const finalFormData = {\n      ...formData,\n      office: selectedOffice || formData.office,\n    };\n    onSubmit(finalFormData);
+    // Use selectedOffice if provided, otherwise use form data
+    const finalFormData = {
+      ...formData,
+      office: selectedOffice || formData.office,
+    };
+    onSubmit(finalFormData);
   };
 
   const handleInputChange = (field: string, value: string | number) => {
