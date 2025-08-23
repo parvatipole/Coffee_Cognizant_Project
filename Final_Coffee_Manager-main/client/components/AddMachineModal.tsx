@@ -82,7 +82,6 @@ export default function AddMachineModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('🔥 AddMachineModal: Form submitted!', { formData, selectedOffice });
 
     try {
       // Use selectedOffice if provided, otherwise use form data
@@ -91,28 +90,12 @@ export default function AddMachineModal({
         office: selectedOffice || formData.office,
       };
 
-      console.log('🚀 AddMachineModal: Calling onSubmit with:', finalFormData);
       await onSubmit(finalFormData);
-      console.log('✅ AddMachineModal: onSubmit completed successfully');
     } catch (error) {
-      console.error('❌ AddMachineModal: Error in onSubmit:', error);
+      console.error('Failed to add machine:', error);
     }
   };
 
-  // Test function to verify onSubmit works
-  const handleTestSubmit = () => {
-    console.log('🧪 Testing onSubmit directly...');
-    const testData = {
-      name: 'Test Machine',
-      location: 'Test Location',
-      office: selectedOffice || 'Test Office',
-      status: 'operational' as const,
-      supplies: { water: 100, milk: 100, coffeeBeans: 100, sugar: 100 },
-      maintenance: { filterStatus: 'good' as const, cleaningStatus: 'clean' as const, temperature: 92, pressure: 15 },
-      notes: 'Test machine'
-    };
-    onSubmit(testData);
-  };
 
   const handleInputChange = (field: string, value: string | number) => {
     setFormData((prev) => ({
@@ -404,27 +387,10 @@ export default function AddMachineModal({
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            {/* Test button for debugging */}
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={handleTestSubmit}
-              className="bg-blue-500 text-white"
-            >
-              🧪 Test Submit
-            </Button>
             <Button
               type="submit"
               disabled={!isFormValid || isLoading}
               className="bg-gradient-to-r from-primary to-primary/80"
-              onClick={(e) => {
-                console.log('🖱️ Add Machine button clicked!', {
-                  isFormValid,
-                  isLoading,
-                  disabled: !isFormValid || isLoading
-                });
-                // Don't prevent default here, let form submission handle it
-              }}
             >
               {isLoading ? 'Adding Machine...' : 'Add Machine'}
             </Button>
