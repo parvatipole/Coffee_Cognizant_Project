@@ -542,15 +542,18 @@ export default function CorporateDashboard() {
 
       const newMachine = {
         id: newMachineId,
+        machineId: newMachineId,
         name: machineData.name,
         status: machineData.status,
+        office: selectedOffice,
+        floor: machineData.floor || "Ground Floor",
         performance: {
           dailyCups: 0,
           efficiency: 100,
           supplies: {
             water: machineData.supplies.water,
             milk: machineData.supplies.milk,
-            coffee: machineData.supplies.coffeeBeans,
+            coffee: machineData.supplies.coffeeBeans, // Map coffeeBeans to coffee
             sugar: machineData.supplies.sugar,
           },
         },
@@ -560,7 +563,12 @@ export default function CorporateDashboard() {
         lastPowerUpdate: new Date().toISOString().slice(0, 19).replace('T', ' '),
         lastMaintenance: new Date().toISOString().slice(0, 10),
         nextMaintenance: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10), // 30 days from now
-        supplies: machineData.supplies,
+        supplies: {
+          water: machineData.supplies.water,
+          milk: machineData.supplies.milk,
+          coffee: machineData.supplies.coffeeBeans, // Fix field mapping
+          sugar: machineData.supplies.sugar,
+        },
         maintenance: machineData.maintenance,
         usage: {
           dailyCups: 0,
@@ -569,7 +577,15 @@ export default function CorporateDashboard() {
         notes: machineData.notes || "New machine installation",
       };
 
-      // Update the machines list (in a real app, this would be an API call)
+      // Save to backend API first
+      try {
+        await apiClient.updateMachine(newMachine.id, newMachine);
+        console.log('Machine saved to backend successfully');
+      } catch (error) {
+        console.log('Backend unavailable, saving locally only:', error.message);
+      }
+
+      // Update the machines list
       setMachines(prev => [...prev, newMachine]);
 
       // Update the office data in the locations array
@@ -583,6 +599,11 @@ export default function CorporateDashboard() {
           )
         }))
       );
+
+      // Save to localStorage for persistence
+      const existingMachines = JSON.parse(localStorage.getItem('coffee_machines') || '[]');
+      const updatedMachines = [...existingMachines, newMachine];
+      localStorage.setItem('coffee_machines', JSON.stringify(updatedMachines));
 
       setIsAddMachineModalOpen(false);
 
