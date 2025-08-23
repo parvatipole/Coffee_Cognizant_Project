@@ -627,6 +627,7 @@ export default function CorporateDashboard() {
         console.log('Machine saved to backend successfully');
       } catch (error) {
         console.log('Backend unavailable, saved locally only:', error.message);
+        // Still continue with local save for offline functionality
       }
 
       // Update the machines list

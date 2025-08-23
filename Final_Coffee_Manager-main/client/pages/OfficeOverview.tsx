@@ -743,6 +743,7 @@ export default function OfficeOverview() {
         console.log('Machine saved to backend successfully');
       } catch (error) {
         console.log('Backend unavailable, saved locally only:', error.message);
+        // Still continue with local save for offline functionality
       }
 
       // Update local machines list
