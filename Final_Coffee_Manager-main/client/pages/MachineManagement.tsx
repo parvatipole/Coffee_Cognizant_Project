@@ -48,6 +48,7 @@ import InteractiveBreadcrumb from "@/components/InteractiveBreadcrumb";
 import { pathToOfficeName, officeNameToPath } from "@/lib/officeRouting";
 import PowerStatusControl from "@/components/PowerStatusControl";
 import { apiClient } from "@/lib/api";
+import { dataManager } from "@/lib/dataManager";
 
 interface MachineData {
   id: string;
@@ -335,17 +336,33 @@ export default function MachineManagement({
     return getOfficeMachineData();
   });
 
-  // Load machine data from API on component mount
+  // Load machine data from API/localStorage on component mount
   useEffect(() => {
     const loadMachineData = async () => {
       try {
-        const data = await apiClient.getMachineByMachineId(machineId!);
-        if (data) {
-          setMachineData(data);
-          // Update alerts if machine data contains them
-          if (data.alerts) {
-            setAlerts(data.alerts);
+        // First try to load from localStorage
+        const localData = dataManager.getMachine(machineId!);
+        if (localData) {
+          setMachineData(localData);
+          if (localData.alerts) {
+            setAlerts(localData.alerts);
           }
+        }
+
+        // Then try to load from API and sync
+        try {
+          const apiData = await apiClient.getMachineByMachineId(machineId!);
+          if (apiData) {
+            const mappedData = dataManager.mapBackendToFrontend(apiData);
+            setMachineData(mappedData);
+            dataManager.saveMachine(mappedData);
+
+            if (apiData.alerts) {
+              setAlerts(apiData.alerts);
+            }
+          }
+        } catch (apiError) {
+          console.log('API unavailable, using local data:', apiError.message);
         }
       } catch (error) {
         console.error("Failed to load machine data:", error);
@@ -474,12 +491,21 @@ export default function MachineManagement({
   const handleSave = async () => {
     setIsLoading(true);
     try {
-      // Save machine data to backend using the database ID
-      await apiClient.updateMachine(machineData.id, machineData);
+      // Save to localStorage immediately for offline support
+      dataManager.saveMachine(machineData);
+
+      // Try to save to backend
+      try {
+        const backendData = dataManager.mapFrontendToBackend(machineData);
+        await apiClient.updateMachine(machineData.id, backendData);
+        console.log('Machine data saved to backend successfully');
+      } catch (apiError) {
+        console.log('Backend unavailable, saved locally only:', apiError.message);
+      }
+
       setIsEditing(false);
     } catch (error) {
       console.error("Failed to save machine data:", error);
-      // Could add toast notification here
     } finally {
       setIsLoading(false);
     }
@@ -501,14 +527,17 @@ export default function MachineManagement({
       supplies: updatedSupplies,
     }));
 
+    // Save to localStorage immediately
+    dataManager.updateMachineSupplies(machineData.id, updatedSupplies);
+
     try {
       // Save to backend
       await apiClient.updateSupplies(machineData.id, {
         supplies: updatedSupplies,
       });
+      console.log('Supplies updated in backend successfully');
     } catch (error) {
-      console.error("Failed to update supplies:", error);
-      // Could revert local state and show error toast
+      console.log('Backend unavailable, saved supplies locally:', error.message);
     }
   };
 
@@ -544,12 +573,16 @@ export default function MachineManagement({
     // Update local state immediately
     setMachineData(updatedData);
 
+    // Save to localStorage immediately
+    dataManager.saveMachine(updatedData);
+
     try {
       // Save to backend
-      await apiClient.updateMachine(machineData.id, updatedData);
+      const backendData = dataManager.mapFrontendToBackend(updatedData);
+      await apiClient.updateMachine(machineData.id, backendData);
+      console.log('Power status updated in backend successfully');
     } catch (error) {
-      console.error("Failed to update power status:", error);
-      // Could revert local state and show error toast
+      console.log('Backend unavailable, saved power status locally:', error.message);
     }
   };
 
