@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiClient } from "@/lib/api";
+import { dataManager } from "@/lib/dataManager";
 import {
   mqttClient,
   MachineStatusUpdate,
@@ -577,12 +578,16 @@ export default function CorporateDashboard() {
         notes: machineData.notes || "New machine installation",
       };
 
-      // Save to backend API first
+      // Save to localStorage immediately for offline support
+      dataManager.saveMachine(newMachine);
+
+      // Save to backend API
       try {
-        await apiClient.createMachine(newMachine);
+        const backendData = dataManager.mapFrontendToBackend(newMachine);
+        await apiClient.createMachine(backendData);
         console.log('Machine saved to backend successfully');
       } catch (error) {
-        console.log('Backend unavailable, saving locally only:', error.message);
+        console.log('Backend unavailable, saved locally only:', error.message);
       }
 
       // Update the machines list
@@ -599,11 +604,6 @@ export default function CorporateDashboard() {
           )
         }))
       );
-
-      // Save to localStorage for persistence
-      const existingMachines = JSON.parse(localStorage.getItem('coffee_machines') || '[]');
-      const updatedMachines = [...existingMachines, newMachine];
-      localStorage.setItem('coffee_machines', JSON.stringify(updatedMachines));
 
       setIsAddMachineModalOpen(false);
 
