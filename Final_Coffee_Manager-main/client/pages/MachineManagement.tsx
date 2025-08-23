@@ -343,13 +343,16 @@ export default function MachineManagement({
         // First try to load from localStorage
         const localData = dataManager.getMachine(machineId!);
         if (localData) {
+          console.log('✅ Loading machine data from localStorage:', localData);
           setMachineData(localData);
           if (localData.alerts) {
             setAlerts(localData.alerts);
           }
+          // Return early if we have local data - this ensures newly created machines display correctly
+          return;
         }
 
-        // Then try to load from API and sync
+        // Only try API if no local data exists
         try {
           const apiData = await apiClient.getMachineByMachineId(machineId!);
           if (apiData) {
@@ -362,7 +365,7 @@ export default function MachineManagement({
             }
           }
         } catch (apiError) {
-          console.log('API unavailable, using local data:', apiError.message);
+          console.log('API unavailable, keeping existing data:', apiError.message);
         }
       } catch (error) {
         console.error("Failed to load machine data:", error);
