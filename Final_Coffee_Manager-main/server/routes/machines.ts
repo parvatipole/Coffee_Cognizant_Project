@@ -18,9 +18,9 @@ const initializeData = () => {
         powerStatus: "online",
         status: "operational",
         supplies: {
-          coffee: 85,
           water: 92,
           milk: 78,
+          coffee: 85,
           sugar: 65,
         },
         usage: { dailyCups: 127, weeklyCups: 890 },
@@ -47,9 +47,9 @@ const initializeData = () => {
         powerStatus: "online",
         status: "operational",
         supplies: {
-          coffee: 92,
           water: 88,
           milk: 45,
+          coffee: 92,
           sugar: 78,
         },
         usage: { dailyCups: 98, weeklyCups: 686 },
@@ -66,9 +66,9 @@ const initializeData = () => {
         powerStatus: "online",
         status: "operational",
         supplies: {
-          coffee: 75,
           water: 95,
           milk: 60,
+          coffee: 75,
           sugar: 80,
         },
         usage: { dailyCups: 110, weeklyCups: 770 },
@@ -85,9 +85,9 @@ const initializeData = () => {
         powerStatus: "online",
         status: "operational",
         supplies: {
-          coffee: 68,
           water: 85,
           milk: 45,
+          coffee: 68,
           sugar: 70,
         },
         usage: { dailyCups: 95, weeklyCups: 665 },
@@ -143,12 +143,40 @@ export const getMachineByMachineId: RequestHandler = (req, res) => {
   res.json(machine);
 };
 
+export const createMachine: RequestHandler = (req, res) => {
+  const { id } = req.body;
+
+  if (!id) {
+    return res.status(400).json({ error: "Machine ID is required" });
+  }
+
+  if (machinesStorage.has(id)) {
+    return res.status(409).json({ error: "Machine with this ID already exists" });
+  }
+
+  // Create new machine
+  const newMachine = { ...req.body, id };
+  machinesStorage.set(id, newMachine);
+
+  res.status(201).json({
+    message: "Machine created successfully",
+    machine: newMachine,
+  });
+};
+
 export const updateMachine: RequestHandler = (req, res) => {
   const { id } = req.params;
   const existingMachine = machinesStorage.get(id);
 
   if (!existingMachine) {
-    return res.status(404).json({ error: "Machine not found" });
+    // If machine doesn't exist, create it (for backward compatibility)
+    const newMachine = { ...req.body, id };
+    machinesStorage.set(id, newMachine);
+
+    return res.status(201).json({
+      message: "Machine created successfully",
+      machine: newMachine,
+    });
   }
 
   // Update the machine data
