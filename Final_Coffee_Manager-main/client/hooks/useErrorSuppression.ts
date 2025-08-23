@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
 
+import { useEffect } from 'react';
+
 /**
  * Custom hook to suppress specific types of runtime errors
  * Particularly useful for third-party script errors that we can't control
