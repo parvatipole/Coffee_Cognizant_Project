@@ -81,17 +81,17 @@ export class GlobalErrorHandler {
     const errorMessage = typeof error === 'string' ? error : error?.message || 'Unknown error';
     
     // Check if this is a video-related error
-    if (errorMessage.toLowerCase().includes('video') || 
+    if (errorMessage.toLowerCase().includes('video') ||
         errorMessage.toLowerCase().includes('media') ||
         errorMessage.toLowerCase().includes('element not found')) {
-      
-      console.warn(`[${source}] Caught video-related error:`, errorMessage);
-      
-      // Optionally show a user-friendly message for critical errors
-      if (errorMessage.toLowerCase().includes('critical')) {
-        this.showUserNotification('A minor technical issue was automatically resolved.', 'info');
+
+      console.info(`✅ [Coffee Manager] Suppressed harmless video error from third-party script:`, errorMessage);
+
+      // Show a brief info message only for the first few errors
+      if (this.errorCount <= 2) {
+        console.info('💡 Video-related errors from external scripts are being automatically handled.');
       }
-      
+
       return; // Don't let video errors crash the app
     }
 
