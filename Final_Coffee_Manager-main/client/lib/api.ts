@@ -135,6 +135,13 @@ class ApiClient {
     return this.request<any[]>("/machines");
   }
 
+  async createMachine(machineData: any) {
+    return this.request<any>("/machines", {
+      method: "POST",
+      body: JSON.stringify(machineData),
+    });
+  }
+
   async getMachine(id: string) {
     return this.request<any>(`/machines/${id}`);
   }
