@@ -547,8 +547,26 @@ export default function CorporateDashboard() {
         performance: {
           dailyCups: 0,
           efficiency: 100,
-          supplies: machineData.supplies,
+          supplies: {
+            water: machineData.supplies.water,
+            milk: machineData.supplies.milk,
+            coffee: machineData.supplies.coffeeBeans,
+            sugar: machineData.supplies.sugar,
+          },
         },
+        // Additional fields for compatibility with MachineData interface
+        location: machineData.location,
+        powerStatus: "online" as const,
+        lastPowerUpdate: new Date().toISOString().slice(0, 19).replace('T', ' '),
+        lastMaintenance: new Date().toISOString().slice(0, 10),
+        nextMaintenance: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10), // 30 days from now
+        supplies: machineData.supplies,
+        maintenance: machineData.maintenance,
+        usage: {
+          dailyCups: 0,
+          weeklyCups: 0,
+        },
+        notes: machineData.notes || "New machine installation",
       };
 
       // Update the machines list (in a real app, this would be an API call)
