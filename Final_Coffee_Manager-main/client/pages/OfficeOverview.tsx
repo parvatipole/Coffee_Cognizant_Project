@@ -29,9 +29,13 @@ import {
   CheckCircle,
   Clock,
   Activity,
+  Plus,
 } from "lucide-react";
 import { pathToOfficeName } from "@/lib/officeRouting";
 import InteractiveBreadcrumb from "@/components/InteractiveBreadcrumb";
+import AddMachineModal from "@/components/AddMachineModal";
+import { dataManager } from "@/lib/dataManager";
+import { apiClient } from "@/lib/api";
 
 interface MachineData {
   id: string;
@@ -64,6 +68,11 @@ interface MachineData {
 export default function OfficeOverview() {
   const { officePath } = useParams<{ officePath: string }>();
   const { user } = useAuth();
+
+  // Add Machine Modal state
+  const [isAddMachineModalOpen, setIsAddMachineModalOpen] = useState(false);
+  const [isAddingMachine, setIsAddingMachine] = useState(false);
+  const [machines, setMachines] = useState<MachineData[]>([]);
 
   if (!officePath) {
     return <div>Office not found</div>;
@@ -629,7 +638,23 @@ export default function OfficeOverview() {
     );
   };
 
-  const machines = getOfficeMachines();
+  // Initialize machines on load
+  React.useEffect(() => {
+    const loadedMachines = getOfficeMachines();
+    // Also load any machines from localStorage for this office
+    const storedMachines = dataManager.getAllMachines().filter(m => m.office === officeName);
+    const allMachines = [...loadedMachines];
+
+    // Add stored machines that don't already exist
+    storedMachines.forEach(stored => {
+      if (!allMachines.find(m => m.id === stored.id)) {
+        allMachines.push(stored);
+      }
+    });
+
+    setMachines(allMachines);
+  }, [officeName]);
+
   const canEdit = user?.role === "technician";
 
   const getStatusColor = (status: string) => {
@@ -708,6 +733,17 @@ export default function OfficeOverview() {
               )}
               {canEdit ? "Technician" : "Admin View"}
             </Badge>
+
+            {/* Add Machine Button */}
+            {canEdit && (
+              <Button
+                onClick={() => setIsAddMachineModalOpen(true)}
+                className="gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Add Machine
+              </Button>
+            )}
           </div>
         </div>
       </header>
