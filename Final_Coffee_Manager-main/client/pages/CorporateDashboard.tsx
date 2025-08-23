@@ -530,6 +530,55 @@ export default function CorporateDashboard() {
     setSelectedMachine(machine);
   };
 
+  const handleAddMachine = async (machineData: any) => {
+    setIsAddingMachine(true);
+
+    try {
+      // Generate unique machine ID
+      const officePrefix = selectedOffice === "Hinjewadi IT Park" ? "HIJ" :
+                          selectedOffice === "Koregaon Park Corporate" ? "KOR" : "NEW";
+      const machineNumber = (machines.length + 1).toString().padStart(3, '0');
+      const newMachineId = `${officePrefix}-${machineNumber}`;
+
+      const newMachine = {
+        id: newMachineId,
+        name: machineData.name,
+        status: machineData.status,
+        performance: {
+          dailyCups: 0,
+          efficiency: 100,
+          supplies: machineData.supplies,
+        },
+      };
+
+      // Update the machines list (in a real app, this would be an API call)
+      setMachines(prev => [...prev, newMachine]);
+
+      // Update the office data in the locations array
+      setLocations(prevLocations =>
+        prevLocations.map(location => ({
+          ...location,
+          offices: location.offices.map(office =>
+            office.name === selectedOffice
+              ? { ...office, machines: [...office.machines, newMachine] }
+              : office
+          )
+        }))
+      );
+
+      setIsAddMachineModalOpen(false);
+
+      // Could add a toast notification here
+      console.log('Machine added successfully:', newMachine);
+
+    } catch (error) {
+      console.error('Failed to add machine:', error);
+      // Could add error toast here
+    } finally {
+      setIsAddingMachine(false);
+    }
+  };
+
   const getLocationData = (locationName: string) => {
     return corporateLocations.find((l) => l.name === locationName);
   };
