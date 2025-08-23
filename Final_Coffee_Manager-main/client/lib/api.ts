@@ -1,6 +1,6 @@
 // API Configuration and JWT Token Management
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8081/api";
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
 
 // Debug logging for local development
 const DEBUG = import.meta.env.VITE_DEBUG === "true" || import.meta.env.DEV;
