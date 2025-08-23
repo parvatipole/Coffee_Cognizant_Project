@@ -42,6 +42,7 @@ import {
 import { Link, useParams } from "react-router-dom";
 import SupplyRefillModal from "@/components/SupplyRefillModal";
 import UsageChart from "@/components/UsageChart";
+import BrewTypeAnalytics from "@/components/BrewTypeAnalytics";
 import MachineStatusDashboard from "@/components/MachineStatusDashboard";
 import InteractiveBreadcrumb from "@/components/InteractiveBreadcrumb";
 import { pathToOfficeName, officeNameToPath } from "@/lib/officeRouting";
