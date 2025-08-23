@@ -41,7 +41,6 @@ import {
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import SupplyRefillModal from "@/components/SupplyRefillModal";
-import RealTimeMonitor from "@/components/RealTimeMonitor";
 import UsageChart from "@/components/UsageChart";
 import MachineStatusDashboard from "@/components/MachineStatusDashboard";
 import InteractiveBreadcrumb from "@/components/InteractiveBreadcrumb";
