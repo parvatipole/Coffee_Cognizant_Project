@@ -20,7 +20,6 @@ interface SystemStatus {
   heating: boolean;
   cleaning: boolean;
   error: boolean;
-  temperature: number;
   pressure: number;
   powerLevel: number;
   wifiSignal: number;
@@ -42,7 +41,6 @@ export default function MachineStatusDashboard({
     heating: true,
     cleaning: false,
     error: false,
-    temperature: 92,
     pressure: 15,
     powerLevel: 85,
     wifiSignal: 90,
@@ -61,7 +59,6 @@ export default function MachineStatusDashboard({
         const newStatus = {
           ...prev,
           brewing: Math.random() > 0.7,
-          temperature: 88 + Math.random() * 8,
           pressure: 13 + Math.random() * 4,
           powerLevel: prev.brewing
             ? 90 + Math.random() * 10
@@ -121,21 +118,7 @@ export default function MachineStatusDashboard({
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {/* Temperature */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Thermometer className="w-4 h-4" />
-                <span className="text-sm font-medium">Temperature</span>
-              </div>
-              <div
-                className={`text-xl font-bold ${getStatusColor(status.temperature, [88, 96])}`}
-              >
-                {status.temperature.toFixed(1)}°C
-              </div>
-              <Progress value={(status.temperature - 80) * 5} className="h-2" />
-            </div>
-
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {/* Pressure */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
