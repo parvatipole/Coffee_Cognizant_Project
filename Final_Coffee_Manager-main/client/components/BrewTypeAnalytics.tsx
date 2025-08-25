@@ -1,16 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Coffee, TrendingUp, Clock, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Coffee, TrendingUp, Calendar } from 'lucide-react';
 
-interface BrewType {
+interface BrewTypeData {
   name: string;
   icon: string;
-  count: number;
+  daily: number;
+  weekly: number;
+  monthly: number;
+  yearly: number;
   trend: 'up' | 'down' | 'stable';
   trendValue: number;
-  color: string;
   popularity: 'high' | 'medium' | 'low';
 }
 
@@ -19,57 +21,93 @@ interface BrewTypeAnalyticsProps {
   className?: string;
 }
 
+type Period = 'daily' | 'weekly' | 'monthly' | 'yearly';
+
 export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnalyticsProps) {
-  // Sample brew types data - in a real app, this would come from API
-  const brewTypes: BrewType[] = [
+  const [selectedPeriod, setSelectedPeriod] = useState<Period>('daily');
+
+  // Sample data - in real app, this would come from API
+  const brewTypesData: BrewTypeData[] = [
     {
       name: 'Espresso',
       icon: '☕',
-      count: 89,
+      daily: 89,
+      weekly: 623,
+      monthly: 2,687,
+      yearly: 32,244,
       trend: 'up',
       trendValue: 12,
-      color: 'bg-amber-500',
       popularity: 'high'
     },
     {
-      name: 'Americano',
+      name: 'Americano', 
       icon: '🇺🇸',
-      count: 67,
+      daily: 67,
+      weekly: 469,
+      monthly: 2,012,
+      yearly: 24,144,
       trend: 'up',
       trendValue: 8,
-      color: 'bg-blue-500',
       popularity: 'high'
     },
     {
       name: 'Cappuccino',
       icon: '🥛',
-      count: 54,
+      daily: 54,
+      weekly: 378,
+      monthly: 1,620,
+      yearly: 19,440,
       trend: 'stable',
       trendValue: 0,
-      color: 'bg-purple-500',
       popularity: 'medium'
     },
     {
       name: 'Latte',
       icon: '🍼',
-      count: 32,
+      daily: 32,
+      weekly: 224,
+      monthly: 960,
+      yearly: 11,520,
       trend: 'down',
       trendValue: -5,
-      color: 'bg-green-500',
       popularity: 'medium'
     },
     {
       name: 'Mocha',
       icon: '🍫',
-      count: 12,
+      daily: 12,
+      weekly: 84,
+      monthly: 360,
+      yearly: 4,320,
       trend: 'up',
       trendValue: 3,
-      color: 'bg-orange-500',
       popularity: 'low'
     }
   ];
 
-  const totalBrews = brewTypes.reduce((sum, brew) => sum + brew.count, 0);
+  const getCurrentCount = (brew: BrewTypeData): number => {
+    switch (selectedPeriod) {
+      case 'daily': return brew.daily;
+      case 'weekly': return brew.weekly;
+      case 'monthly': return brew.monthly;
+      case 'yearly': return brew.yearly;
+      default: return brew.daily;
+    }
+  };
+
+  const getPeriodLabel = (): string => {
+    switch (selectedPeriod) {
+      case 'daily': return 'Today';
+      case 'weekly': return 'This Week';
+      case 'monthly': return 'This Month';
+      case 'yearly': return 'This Year';
+      default: return 'Today';
+    }
+  };
+
+  const getTotalCups = (): number => {
+    return brewTypesData.reduce((sum, brew) => sum + getCurrentCount(brew), 0);
+  };
 
   const getTrendIcon = (trend: string, value: number) => {
     if (trend === 'up') return <TrendingUp className="w-3 h-3 text-green-600" />;
@@ -101,79 +139,112 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Coffee className="w-5 h-5 text-primary" />
-          Brew Type Analytics
+          Brew Type Consumption
         </CardTitle>
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <Users className="w-4 h-4" />
-            {totalBrews} total brews today
-          </div>
-          <div className="flex items-center gap-1">
-            <Clock className="w-4 h-4" />
-            Updated 2 minutes ago
-          </div>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Calendar className="w-4 h-4" />
+          {getPeriodLabel()} - {getTotalCups()} total cups
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Overview Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="text-center p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg">
-            <div className="text-2xl font-bold text-primary">{totalBrews}</div>
-            <div className="text-sm text-muted-foreground">Total Brews</div>
-          </div>
-          <div className="text-center p-4 bg-gradient-to-br from-green-100 to-green-50 rounded-lg">
-            <div className="text-2xl font-bold text-green-700">{brewTypes[0].name}</div>
-            <div className="text-sm text-muted-foreground">Most Popular</div>
-          </div>
-          <div className="text-center p-4 bg-gradient-to-br from-blue-100 to-blue-50 rounded-lg">
-            <div className="text-2xl font-bold text-blue-700">
-              {brewTypes.filter(b => b.trend === 'up').length}
-            </div>
-            <div className="text-sm text-muted-foreground">Trending Up</div>
+        {/* Period Selection */}
+        <div className="flex flex-wrap gap-2">
+          {(['daily', 'weekly', 'monthly', 'yearly'] as Period[]).map((period) => (
+            <Button
+              key={period}
+              variant={selectedPeriod === period ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedPeriod(period)}
+              className="capitalize"
+            >
+              {period}
+            </Button>
+          ))}
+        </div>
+
+        {/* Consumption Summary */}
+        <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg p-4">
+          <h4 className="font-semibold text-primary mb-3">{getPeriodLabel()}'s Summary</h4>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-primary">{getTotalCups()}</div>
+            <div className="text-sm text-muted-foreground">Total Cups Served</div>
           </div>
         </div>
 
         {/* Brew Types List */}
         <div className="space-y-4">
           <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-            Brew Breakdown
+            Consumption by Type ({getPeriodLabel()})
           </h4>
-          {brewTypes.map((brew, index) => (
-            <div 
-              key={brew.name} 
-              className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-transparent rounded-lg hover:from-gray-100 transition-colors"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <div className="flex items-center gap-3 flex-1">
-                <div className="text-2xl">{brew.icon}</div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-medium">{brew.name}</h4>
-                    {getPopularityBadge(brew.popularity)}
+          
+          <div className="space-y-3">
+            {brewTypesData
+              .sort((a, b) => getCurrentCount(b) - getCurrentCount(a))
+              .map((brew, index) => (
+              <div 
+                key={brew.name} 
+                className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-transparent rounded-lg hover:from-gray-100 transition-colors border border-gray-100"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className="flex items-center gap-3 flex-1">
+                  <div className="text-2xl">{brew.icon}</div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="font-medium">{brew.name}</h4>
+                      {getPopularityBadge(brew.popularity)}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {getCurrentCount(brew)} cups
+                    </div>
                   </div>
-                  <div className="mt-1">
-                    <span className="text-xs text-muted-foreground">
-                      {brew.count} cups
-                    </span>
+                </div>
+                
+                <div className="text-right space-y-1">
+                  <div className="font-bold text-2xl text-primary">{getCurrentCount(brew)}</div>
+                  <div className={`flex items-center justify-end gap-1 text-xs ${getTrendColor(brew.trend)}`}>
+                    {getTrendIcon(brew.trend, brew.trendValue)}
+                    {brew.trend !== 'stable' && (
+                      <span>{Math.abs(brew.trendValue)}%</span>
+                    )}
+                    {brew.trend === 'stable' && <span>Stable</span>}
                   </div>
                 </div>
               </div>
-              
-              <div className="text-right space-y-1">
-                <div className="font-bold text-lg">{brew.count}</div>
-                <div className={`flex items-center gap-1 text-xs ${getTrendColor(brew.trend)}`}>
-                  {getTrendIcon(brew.trend, brew.trendValue)}
-                  {brew.trend !== 'stable' && (
-                    <span>{Math.abs(brew.trendValue)}%</span>
-                  )}
-                  {brew.trend === 'stable' && <span>Stable</span>}
-                </div>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
-
+        {/* Quick Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="text-xl font-bold text-blue-700">{brewTypesData[0].name}</div>
+            <div className="text-sm text-blue-600">Most Popular</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              {getCurrentCount(brewTypesData[0])} cups
+            </div>
+          </div>
+          <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+            <div className="text-xl font-bold text-green-700">
+              {brewTypesData.filter(b => b.trend === 'up').length}
+            </div>
+            <div className="text-sm text-green-600">Trending Up</div>
+            <div className="text-xs text-muted-foreground mt-1">Types</div>
+          </div>
+          <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
+            <div className="text-xl font-bold text-purple-700">
+              {brewTypesData.filter(b => b.popularity === 'high').length}
+            </div>
+            <div className="text-sm text-purple-600">High Demand</div>
+            <div className="text-xs text-muted-foreground mt-1">Types</div>
+          </div>
+          <div className="text-center p-4 bg-amber-50 rounded-lg border border-amber-200">
+            <div className="text-xl font-bold text-amber-700">
+              {Math.round(getTotalCups() / brewTypesData.length)}
+            </div>
+            <div className="text-sm text-amber-600">Avg per Type</div>
+            <div className="text-xs text-muted-foreground mt-1">Cups</div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
