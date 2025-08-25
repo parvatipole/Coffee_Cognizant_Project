@@ -771,23 +771,8 @@ export default function MachineManagement({
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-6">
               <div className="grid grid-cols-1 gap-6">
-                <MachineStatusDashboard
-                  canControl={canEdit}
-                  onStatusChange={(status) => {
-                    // Real-time status updated
-                  }}
-                />
               </div>
 
-              {/* Power Status Control */}
-              <PowerStatusControl
-                machineId={machineData.id}
-                machineName={machineData.name}
-                powerStatus={machineData.powerStatus}
-                lastPowerUpdate={machineData.lastPowerUpdate}
-                canEdit={canEdit}
-                onPowerStatusChange={handlePowerStatusChange}
-              />
 
               {/* Enhanced Machine Information */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
