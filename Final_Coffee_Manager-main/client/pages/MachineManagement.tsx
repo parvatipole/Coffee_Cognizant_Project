@@ -744,29 +744,6 @@ export default function MachineManagement({
                     </div>
                   )}
                 </div>
-                <div className="flex gap-2">
-                  <Badge
-                    className={`${getStatusColor(machineData.status)} text-white animate-pulse`}
-                  >
-                    {machineData.status.charAt(0).toUpperCase() +
-                      machineData.status.slice(1)}
-                  </Badge>
-                  <Badge
-                    variant={
-                      machineData.powerStatus === "online"
-                        ? "default"
-                        : "destructive"
-                    }
-                    className="gap-1"
-                  >
-                    {machineData.powerStatus === "online" ? (
-                      <Zap className="w-3 h-3" />
-                    ) : (
-                      <ZapOff className="w-3 h-3" />
-                    )}
-                    {machineData.powerStatus.toUpperCase()}
-                  </Badge>
-                </div>
               </div>
             </CardHeader>
           </Card>
