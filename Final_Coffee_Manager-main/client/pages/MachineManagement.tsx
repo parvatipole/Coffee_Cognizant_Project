@@ -43,10 +43,8 @@ import { Link, useParams } from "react-router-dom";
 import SupplyRefillModal from "@/components/SupplyRefillModal";
 import UsageChart from "@/components/UsageChart";
 import BrewTypeAnalytics from "@/components/BrewTypeAnalytics";
-import MachineStatusDashboard from "@/components/MachineStatusDashboard";
 import InteractiveBreadcrumb from "@/components/InteractiveBreadcrumb";
 import { pathToOfficeName, officeNameToPath } from "@/lib/officeRouting";
-import PowerStatusControl from "@/components/PowerStatusControl";
 import { apiClient } from "@/lib/api";
 import { dataManager } from "@/lib/dataManager";
 
@@ -54,9 +52,6 @@ interface MachineData {
   id: string;
   name: string;
   location: string;
-  status: "operational" | "maintenance" | "offline";
-  powerStatus: "online" | "offline";
-  lastPowerUpdate: string;
   lastMaintenance: string;
   nextMaintenance: string;
   supplies: {
