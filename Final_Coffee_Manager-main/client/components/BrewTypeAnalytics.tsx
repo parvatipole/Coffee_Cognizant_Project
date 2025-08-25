@@ -173,16 +173,6 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
           ))}
         </div>
 
-        {/* Quick Insights */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
-          <h4 className="font-semibold text-blue-900 mb-2">☕ Quick Insights</h4>
-          <div className="space-y-1 text-sm text-blue-800">
-            <p>• <strong>Espresso</strong> remains the most popular choice (35% of all brews)</p>
-            <p>• <strong>Americano</strong> usage is trending up by 8% this week</p>
-            <p>• Morning hours see more <strong>strong coffee</strong> preferences</p>
-            <p>• <strong>Mocha</strong> is gaining popularity among afternoon users</p>
-          </div>
-        </div>
 
         {/* Time-based Quick Stats */}
         <div className="grid grid-cols-2 gap-4">
