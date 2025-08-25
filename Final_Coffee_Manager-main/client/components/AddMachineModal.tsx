@@ -69,7 +69,6 @@ export default function AddMachineModal({
     maintenance: {
       filterStatus: 'good',
       cleaningStatus: 'clean',
-      temperature: 92,
       pressure: 15,
     },
     notes: '',
@@ -138,7 +137,6 @@ export default function AddMachineModal({
         maintenance: {
           filterStatus: 'good',
           cleaningStatus: 'clean',
-          temperature: 92,
           pressure: 15,
         },
         notes: '',
