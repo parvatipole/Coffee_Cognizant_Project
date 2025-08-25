@@ -33,8 +33,8 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
       icon: '☕',
       daily: 89,
       weekly: 623,
-      monthly: 2,687,
-      yearly: 32,244,
+      monthly: 2687,
+      yearly: 32244,
       trend: 'up',
       trendValue: 12,
       popularity: 'high'
@@ -44,8 +44,8 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
       icon: '🇺🇸',
       daily: 67,
       weekly: 469,
-      monthly: 2,012,
-      yearly: 24,144,
+      monthly: 2012,
+      yearly: 24144,
       trend: 'up',
       trendValue: 8,
       popularity: 'high'
@@ -55,8 +55,8 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
       icon: '🥛',
       daily: 54,
       weekly: 378,
-      monthly: 1,620,
-      yearly: 19,440,
+      monthly: 1620,
+      yearly: 19440,
       trend: 'stable',
       trendValue: 0,
       popularity: 'medium'
@@ -67,7 +67,7 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
       daily: 32,
       weekly: 224,
       monthly: 960,
-      yearly: 11,520,
+      yearly: 11520,
       trend: 'down',
       trendValue: -5,
       popularity: 'medium'
@@ -78,7 +78,7 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
       daily: 12,
       weekly: 84,
       monthly: 360,
-      yearly: 4,320,
+      yearly: 4320,
       trend: 'up',
       trendValue: 3,
       popularity: 'low'
@@ -134,6 +134,10 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
     }
   };
 
+  const formatNumber = (num: number): string => {
+    return num.toLocaleString();
+  };
+
   return (
     <Card className={`animate-fadeIn ${className}`}>
       <CardHeader>
@@ -143,7 +147,7 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
         </CardTitle>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Calendar className="w-4 h-4" />
-          {getPeriodLabel()} - {getTotalCups()} total cups
+          {getPeriodLabel()} - {formatNumber(getTotalCups())} total cups
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -166,7 +170,7 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
         <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg p-4">
           <h4 className="font-semibold text-primary mb-3">{getPeriodLabel()}'s Summary</h4>
           <div className="text-center">
-            <div className="text-3xl font-bold text-primary">{getTotalCups()}</div>
+            <div className="text-3xl font-bold text-primary">{formatNumber(getTotalCups())}</div>
             <div className="text-sm text-muted-foreground">Total Cups Served</div>
           </div>
         </div>
@@ -194,13 +198,13 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
                       {getPopularityBadge(brew.popularity)}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      {getCurrentCount(brew)} cups
+                      {formatNumber(getCurrentCount(brew))} cups
                     </div>
                   </div>
                 </div>
                 
                 <div className="text-right space-y-1">
-                  <div className="font-bold text-2xl text-primary">{getCurrentCount(brew)}</div>
+                  <div className="font-bold text-2xl text-primary">{formatNumber(getCurrentCount(brew))}</div>
                   <div className={`flex items-center justify-end gap-1 text-xs ${getTrendColor(brew.trend)}`}>
                     {getTrendIcon(brew.trend, brew.trendValue)}
                     {brew.trend !== 'stable' && (
@@ -220,7 +224,7 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
             <div className="text-xl font-bold text-blue-700">{brewTypesData[0].name}</div>
             <div className="text-sm text-blue-600">Most Popular</div>
             <div className="text-xs text-muted-foreground mt-1">
-              {getCurrentCount(brewTypesData[0])} cups
+              {formatNumber(getCurrentCount(brewTypesData[0]))} cups
             </div>
           </div>
           <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
