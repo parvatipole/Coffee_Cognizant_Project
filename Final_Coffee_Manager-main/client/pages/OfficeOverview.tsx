@@ -824,39 +824,16 @@ export default function OfficeOverview() {
               Office Overview - {officeName}
             </CardTitle>
             <CardDescription>
-              Total {officeStats.total} coffee machines •{" "}
-              {officeStats.operational} operational • {officeStats.maintenance}{" "}
-              in maintenance • {officeStats.offline} offline
+              Total {machines.length} coffee machines available
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                <div>
-                  <div className="text-lg font-semibold text-green-700">
-                    {officeStats.operational}
-                  </div>
-                  <div className="text-sm text-green-600">Operational</div>
-                </div>
+            <div className="text-center p-6">
+              <div className="text-3xl font-bold text-primary mb-2">
+                {machines.length}
               </div>
-              <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg">
-                <Settings className="w-5 h-5 text-orange-600" />
-                <div>
-                  <div className="text-lg font-semibold text-orange-700">
-                    {officeStats.maintenance}
-                  </div>
-                  <div className="text-sm text-orange-600">Maintenance</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-red-50 rounded-lg">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
-                <div>
-                  <div className="text-lg font-semibold text-red-700">
-                    {officeStats.offline}
-                  </div>
-                  <div className="text-sm text-red-600">Offline</div>
-                </div>
+              <div className="text-muted-foreground">
+                Coffee Machines Available
               </div>
             </div>
           </CardContent>
