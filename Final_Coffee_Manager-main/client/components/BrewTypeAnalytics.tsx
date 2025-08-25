@@ -8,7 +8,6 @@ interface BrewType {
   name: string;
   icon: string;
   count: number;
-  percentage: number;
   trend: 'up' | 'down' | 'stable';
   trendValue: number;
   color: string;
@@ -27,17 +26,15 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
       name: 'Espresso',
       icon: '☕',
       count: 89,
-      percentage: 35,
       trend: 'up',
       trendValue: 12,
       color: 'bg-amber-500',
       popularity: 'high'
     },
     {
-      name: 'Americano', 
+      name: 'Americano',
       icon: '🇺🇸',
       count: 67,
-      percentage: 26,
       trend: 'up',
       trendValue: 8,
       color: 'bg-blue-500',
@@ -47,7 +44,6 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
       name: 'Cappuccino',
       icon: '🥛',
       count: 54,
-      percentage: 21,
       trend: 'stable',
       trendValue: 0,
       color: 'bg-purple-500',
@@ -57,7 +53,6 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
       name: 'Latte',
       icon: '🍼',
       count: 32,
-      percentage: 13,
       trend: 'down',
       trendValue: -5,
       color: 'bg-green-500',
@@ -67,7 +62,6 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
       name: 'Mocha',
       icon: '🍫',
       count: 12,
-      percentage: 5,
       trend: 'up',
       trendValue: 3,
       color: 'bg-orange-500',
@@ -157,10 +151,9 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
                     <h4 className="font-medium">{brew.name}</h4>
                     {getPopularityBadge(brew.popularity)}
                   </div>
-                  <div className="flex items-center gap-4 mt-1">
-                    <Progress value={brew.percentage} className="h-2 flex-1 max-w-[120px]" />
+                  <div className="mt-1">
                     <span className="text-xs text-muted-foreground">
-                      {brew.percentage}%
+                      {brew.count} cups
                     </span>
                   </div>
                 </div>
