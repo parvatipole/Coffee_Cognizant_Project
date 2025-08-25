@@ -8,9 +8,6 @@ interface MachineData {
   location: string;
   office: string;
   floor?: string;
-  status: 'operational' | 'maintenance' | 'offline';
-  powerStatus: 'online' | 'offline';
-  lastPowerUpdate: string;
   lastMaintenance: string;
   nextMaintenance: string;
   supplies: {
