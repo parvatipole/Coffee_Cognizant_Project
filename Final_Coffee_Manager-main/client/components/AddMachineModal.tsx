@@ -327,17 +327,6 @@ export default function AddMachineModal({
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="temperature">Operating Temperature (°C)</Label>
-                <Input
-                  id="temperature"
-                  type="number"
-                  min="80"
-                  max="100"
-                  value={formData.maintenance.temperature}
-                  onChange={(e) => handleMaintenanceChange('temperature', parseInt(e.target.value) || 92)}
-                />
-              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="pressure">Operating Pressure (bar)</Label>
