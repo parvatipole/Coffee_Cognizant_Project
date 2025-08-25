@@ -993,12 +993,6 @@ export default function OfficeOverview() {
                       This Week
                     </div>
                   </div>
-                  <div className="text-center">
-                    <div className="font-semibold text-lg">
-                      {machine.maintenance.temperature}°C
-                    </div>
-                    <div className="text-muted-foreground text-xs">Temp</div>
-                  </div>
                 </div>
 
                 {/* Action Button */}
