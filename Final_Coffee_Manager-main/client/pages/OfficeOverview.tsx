@@ -878,29 +878,6 @@ export default function OfficeOverview() {
                       {machine.location}
                     </CardDescription>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <Badge
-                      className={`${getStatusColor(machine.status)} text-white text-xs`}
-                    >
-                      {machine.status.charAt(0).toUpperCase() +
-                        machine.status.slice(1)}
-                    </Badge>
-                    <Badge
-                      variant={
-                        machine.powerStatus === "online"
-                          ? "default"
-                          : "destructive"
-                      }
-                      className="gap-1 text-xs"
-                    >
-                      {machine.powerStatus === "online" ? (
-                        <Zap className="w-2 h-2" />
-                      ) : (
-                        <ZapOff className="w-2 h-2" />
-                      )}
-                      {machine.powerStatus.toUpperCase()}
-                    </Badge>
-                  </div>
                 </div>
               </CardHeader>
 
