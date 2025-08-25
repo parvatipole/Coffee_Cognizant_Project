@@ -19,7 +19,6 @@ interface RealTimeData {
   isOnline: boolean;
   currentOrder: string | null;
   queueLength: number;
-  temperature: number;
   pressure: number;
   powerUsage: number;
   cupsToday: number;
@@ -35,7 +34,6 @@ export default function RealTimeMonitor({ onActivityUpdate }: RealTimeMonitorPro
     isOnline: true,
     currentOrder: null,
     queueLength: 0,
-    temperature: 92,
     pressure: 15,
     powerUsage: 75,
     cupsToday: 127,
@@ -62,7 +60,6 @@ export default function RealTimeMonitor({ onActivityUpdate }: RealTimeMonitorPro
           ...prev,
           currentOrder: Math.random() > 0.7 ? orders[Math.floor(Math.random() * orders.length)] : null,
           queueLength: Math.floor(Math.random() * 5),
-          temperature: 90 + Math.random() * 6,
           pressure: 14 + Math.random() * 3,
           powerUsage: 70 + Math.random() * 20,
           cupsToday: prev.cupsToday + (Math.random() > 0.8 ? 1 : 0),
@@ -77,11 +74,6 @@ export default function RealTimeMonitor({ onActivityUpdate }: RealTimeMonitorPro
     return () => clearInterval(interval);
   }, [isLive, onActivityUpdate]);
 
-  const getTemperatureColor = (temp: number) => {
-    if (temp >= 90 && temp <= 96) return 'text-green-600';
-    if (temp >= 85 && temp <= 98) return 'text-orange-500';
-    return 'text-red-500';
-  };
 
   const getPressureColor = (pressure: number) => {
     if (pressure >= 14 && pressure <= 16) return 'text-green-600';
@@ -145,16 +137,6 @@ export default function RealTimeMonitor({ onActivityUpdate }: RealTimeMonitorPro
 
         {/* Performance Metrics */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Thermometer className="w-4 h-4" />
-              <span className="text-sm font-medium">Temperature</span>
-            </div>
-            <div className={`text-lg font-bold ${getTemperatureColor(data.temperature)}`}>
-              {data.temperature.toFixed(1)}°C
-            </div>
-          </div>
-
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Gauge className="w-4 h-4" />
