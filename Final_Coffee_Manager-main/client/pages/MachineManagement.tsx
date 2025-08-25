@@ -1045,120 +1045,66 @@ export default function MachineManagement({
                 ))}
               </div>
 
-              {/* Supply Consumption Trends */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card
-                  className="animate-fadeIn"
-                  style={{ animationDelay: "400ms" }}
-                >
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4" />
-                      Consumption Trends
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
-                        <div className="flex items-center gap-2">
-                          <Droplets className="w-4 h-4 text-blue-500" />
-                          <span className="font-medium">Water</span>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-medium">15% daily</div>
-                          <div className="text-xs text-muted-foreground">
-                            Normal usage
-                          </div>
+              {/* Recent Refills */}
+              <Card
+                className="animate-fadeIn"
+                style={{ animationDelay: "400ms" }}
+              >
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    Recent Refills
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                      <div>
+                        <div className="font-medium text-sm">Water Tank</div>
+                        <div className="text-xs text-muted-foreground">
+                          Refilled to 100%
                         </div>
                       </div>
-                      <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
-                        <div className="flex items-center gap-2">
-                          <Coffee className="w-4 h-4 text-amber-600" />
-                          <span className="font-medium">Coffee Beans</span>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-medium">12% daily</div>
-                          <div className="text-xs text-muted-foreground">
-                            High usage
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
-                        <div className="flex items-center gap-2">
-                          <Milk className="w-4 h-4 text-purple-500" />
-                          <span className="font-medium">Milk</span>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-medium">8% daily</div>
-                          <div className="text-xs text-muted-foreground">
-                            Low usage
-                          </div>
+                      <div className="text-right">
+                        <div className="text-xs font-medium">2 hours ago</div>
+                        <div className="text-xs text-muted-foreground">
+                          by {user?.name}
                         </div>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-
-                <Card
-                  className="animate-fadeIn"
-                  style={{ animationDelay: "500ms" }}
-                >
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      Recent Refills
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
-                        <div>
-                          <div className="font-medium text-sm">Water Tank</div>
-                          <div className="text-xs text-muted-foreground">
-                            Refilled to 100%
-                          </div>
+                    <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div>
+                        <div className="font-medium text-sm">
+                          Coffee Beans
                         </div>
-                        <div className="text-right">
-                          <div className="text-xs font-medium">2 hours ago</div>
-                          <div className="text-xs text-muted-foreground">
-                            by {user?.name}
-                          </div>
+                        <div className="text-xs text-muted-foreground">
+                          Refilled to 90%
                         </div>
                       </div>
-                      <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
-                        <div>
-                          <div className="font-medium text-sm">
-                            Coffee Beans
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            Refilled to 90%
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-xs font-medium">Yesterday</div>
-                          <div className="text-xs text-muted-foreground">
-                            by Tech Support
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-200">
-                        <div>
-                          <div className="font-medium text-sm">Sugar</div>
-                          <div className="text-xs text-muted-foreground">
-                            Refilled to 95%
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-xs font-medium">3 days ago</div>
-                          <div className="text-xs text-muted-foreground">
-                            by John Tech
-                          </div>
+                      <div className="text-right">
+                        <div className="text-xs font-medium">Yesterday</div>
+                        <div className="text-xs text-muted-foreground">
+                          by Tech Support
                         </div>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
+                    <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-200">
+                      <div>
+                        <div className="font-medium text-sm">Sugar</div>
+                        <div className="text-xs text-muted-foreground">
+                          Refilled to 95%
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xs font-medium">3 days ago</div>
+                        <div className="text-xs text-muted-foreground">
+                          by John Tech
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
 
             {/* Analytics Tab */}
