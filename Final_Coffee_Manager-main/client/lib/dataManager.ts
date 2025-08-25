@@ -23,7 +23,6 @@ interface MachineData {
   maintenance: {
     filterStatus: 'good' | 'needs_replacement' | 'critical';
     cleaningStatus: 'clean' | 'needs_cleaning' | 'overdue';
-    temperature: number;
     pressure: number;
   };
   usage: {
