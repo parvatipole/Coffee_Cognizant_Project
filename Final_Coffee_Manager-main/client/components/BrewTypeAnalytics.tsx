@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Coffee, TrendingUp, Calendar } from 'lucide-react';
+import { Coffee, Calendar } from 'lucide-react';
 
 interface BrewTypeData {
   name: string;
@@ -11,9 +10,6 @@ interface BrewTypeData {
   weekly: number;
   monthly: number;
   yearly: number;
-  trend: 'up' | 'down' | 'stable';
-  trendValue: number;
-  popularity: 'high' | 'medium' | 'low';
 }
 
 interface BrewTypeAnalyticsProps {
@@ -34,10 +30,7 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
       daily: 89,
       weekly: 623,
       monthly: 2687,
-      yearly: 32244,
-      trend: 'up',
-      trendValue: 12,
-      popularity: 'high'
+      yearly: 32244
     },
     {
       name: 'Americano', 
@@ -45,10 +38,7 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
       daily: 67,
       weekly: 469,
       monthly: 2012,
-      yearly: 24144,
-      trend: 'up',
-      trendValue: 8,
-      popularity: 'high'
+      yearly: 24144
     },
     {
       name: 'Cappuccino',
@@ -56,10 +46,7 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
       daily: 54,
       weekly: 378,
       monthly: 1620,
-      yearly: 19440,
-      trend: 'stable',
-      trendValue: 0,
-      popularity: 'medium'
+      yearly: 19440
     },
     {
       name: 'Latte',
@@ -67,10 +54,7 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
       daily: 32,
       weekly: 224,
       monthly: 960,
-      yearly: 11520,
-      trend: 'down',
-      trendValue: -5,
-      popularity: 'medium'
+      yearly: 11520
     },
     {
       name: 'Mocha',
@@ -78,10 +62,7 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
       daily: 12,
       weekly: 84,
       monthly: 360,
-      yearly: 4320,
-      trend: 'up',
-      trendValue: 3,
-      popularity: 'low'
+      yearly: 4320
     }
   ];
 
@@ -107,31 +88,6 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
 
   const getTotalCups = (): number => {
     return brewTypesData.reduce((sum, brew) => sum + getCurrentCount(brew), 0);
-  };
-
-  const getTrendIcon = (trend: string, value: number) => {
-    if (trend === 'up') return <TrendingUp className="w-3 h-3 text-green-600" />;
-    if (trend === 'down') return <TrendingUp className="w-3 h-3 text-red-600 rotate-180" />;
-    return <span className="w-3 h-3 text-gray-400">→</span>;
-  };
-
-  const getTrendColor = (trend: string) => {
-    if (trend === 'up') return 'text-green-600';
-    if (trend === 'down') return 'text-red-600';
-    return 'text-gray-500';
-  };
-
-  const getPopularityBadge = (popularity: string) => {
-    switch (popularity) {
-      case 'high':
-        return <Badge variant="default" className="bg-green-100 text-green-800">High</Badge>;
-      case 'medium':
-        return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Medium</Badge>;
-      case 'low':
-        return <Badge variant="outline" className="bg-gray-100 text-gray-600">Low</Badge>;
-      default:
-        return null;
-    }
   };
 
   const formatNumber = (num: number): string => {
@@ -193,33 +149,23 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
                 <div className="flex items-center gap-3 flex-1">
                   <div className="text-2xl">{brew.icon}</div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium">{brew.name}</h4>
-                      {getPopularityBadge(brew.popularity)}
-                    </div>
+                    <h4 className="font-medium mb-1">{brew.name}</h4>
                     <div className="text-sm text-muted-foreground">
                       {formatNumber(getCurrentCount(brew))} cups
                     </div>
                   </div>
                 </div>
                 
-                <div className="text-right space-y-1">
+                <div className="text-right">
                   <div className="font-bold text-2xl text-primary">{formatNumber(getCurrentCount(brew))}</div>
-                  <div className={`flex items-center justify-end gap-1 text-xs ${getTrendColor(brew.trend)}`}>
-                    {getTrendIcon(brew.trend, brew.trendValue)}
-                    {brew.trend !== 'stable' && (
-                      <span>{Math.abs(brew.trendValue)}%</span>
-                    )}
-                    {brew.trend === 'stable' && <span>Stable</span>}
-                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Quick Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* Simple Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
             <div className="text-xl font-bold text-blue-700">{brewTypesData[0].name}</div>
             <div className="text-sm text-blue-600">Most Popular</div>
@@ -229,17 +175,10 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
           </div>
           <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
             <div className="text-xl font-bold text-green-700">
-              {brewTypesData.filter(b => b.trend === 'up').length}
+              {brewTypesData.length}
             </div>
-            <div className="text-sm text-green-600">Trending Up</div>
-            <div className="text-xs text-muted-foreground mt-1">Types</div>
-          </div>
-          <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
-            <div className="text-xl font-bold text-purple-700">
-              {brewTypesData.filter(b => b.popularity === 'high').length}
-            </div>
-            <div className="text-sm text-purple-600">High Demand</div>
-            <div className="text-xs text-muted-foreground mt-1">Types</div>
+            <div className="text-sm text-green-600">Brew Types</div>
+            <div className="text-xs text-muted-foreground mt-1">Available</div>
           </div>
           <div className="text-center p-4 bg-amber-50 rounded-lg border border-amber-200">
             <div className="text-xl font-bold text-amber-700">
