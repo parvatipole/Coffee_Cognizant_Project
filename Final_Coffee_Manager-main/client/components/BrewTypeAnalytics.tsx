@@ -174,17 +174,6 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
         </div>
 
 
-        {/* Time-based Quick Stats */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="text-center p-3 bg-amber-50 rounded-lg border border-amber-200">
-            <div className="text-lg font-bold text-amber-700">Peak: 10-11 AM</div>
-            <div className="text-xs text-amber-600">Highest brew activity</div>
-          </div>
-          <div className="text-center p-3 bg-purple-50 rounded-lg border border-purple-200">
-            <div className="text-lg font-bold text-purple-700">43 brews/hour</div>
-            <div className="text-xs text-purple-600">Average rate</div>
-          </div>
-        </div>
       </CardContent>
     </Card>
   );
