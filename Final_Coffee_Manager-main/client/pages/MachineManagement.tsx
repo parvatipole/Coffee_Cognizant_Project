@@ -1168,29 +1168,7 @@ export default function MachineManagement({
               {/* Brew Type Analytics */}
               <BrewTypeAnalytics machineId={machineData.id} />
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="animate-fadeIn">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2">
-                      <Coffee className="w-4 h-4" />
-                      Today's Performance
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center space-y-2">
-                      <div className="text-3xl font-bold text-primary animate-counter">
-                        {machineData.usage.dailyCups}
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Cups Served
-                      </p>
-                      <div className="flex items-center justify-center gap-1 text-green-600">
-                        <TrendingUp className="w-4 h-4" />
-                        <span className="text-sm">+12% vs yesterday</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                 <Card
                   className="animate-fadeIn"
