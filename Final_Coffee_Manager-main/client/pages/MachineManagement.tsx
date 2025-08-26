@@ -1144,33 +1144,6 @@ export default function MachineManagement({
                   </CardContent>
                 </Card>
 
-                <Card
-                  className="animate-fadeIn"
-                  style={{ animationDelay: "400ms" }}
-                >
-                  <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4" />
-                      Supply Usage Trends
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Most Used Supply</span>
-                        <span className="font-bold text-blue-600">Water</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Weekly Refills</span>
-                        <span className="font-bold text-green-600">12</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Next Scheduled</span>
-                        <span className="font-bold text-primary">Coffee (2 days)</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
               </div>
             </TabsContent>
           </Tabs>
