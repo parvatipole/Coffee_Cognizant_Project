@@ -853,20 +853,6 @@ export default function CorporateDashboard() {
                           </div>
                         </div>
 
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium">
-                              Operational Efficiency
-                            </span>
-                            <span className="text-sm font-bold text-blue-600">
-                              {location.efficiency}%
-                            </span>
-                          </div>
-                          <Progress
-                            value={location.efficiency}
-                            className="h-3 bg-gray-200"
-                          />
-                        </div>
 
                         <div className="pt-3 border-t">
                           <div className="flex items-center justify-between">
@@ -910,11 +896,6 @@ export default function CorporateDashboard() {
                               sum + office.performance.weeklyCups,
                             0,
                           ) || 0;
-                        const avgUptime =
-                          locationData?.offices.reduce(
-                            (sum, office) => sum + office.performance.uptime,
-                            0,
-                          ) / (locationData?.offices.length || 1) || 0;
                         const totalAlerts =
                           locationData?.offices.reduce(
                             (sum, office) => sum + office.performance.alerts,
@@ -936,13 +917,13 @@ export default function CorporateDashboard() {
                             </div>
                             <div className="text-center">
                               <div className="text-3xl font-bold text-white">
-                                {avgUptime.toFixed(1)}%
+                                {locationData?.offices.length || 0}
                               </div>
                               <div className="text-blue-100">
-                                Average Uptime
+                                Office Locations
                               </div>
                               <div className="text-xs text-blue-200 mt-1">
-                                🔄 System reliability
+                                🏢 Active offices
                               </div>
                             </div>
                             <div className="text-center">
@@ -992,7 +973,7 @@ export default function CorporateDashboard() {
                                 {office.address}
                               </p>
 
-                              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                 <div className="text-center">
                                   <div className="text-lg font-bold text-blue-600">
                                     {office.performance.weeklyCups}
@@ -1003,18 +984,10 @@ export default function CorporateDashboard() {
                                 </div>
                                 <div className="text-center">
                                   <div className="text-lg font-bold text-purple-600">
-                                    {office.performance.efficiency}%
+                                    {office.machines.length}
                                   </div>
                                   <div className="text-xs text-muted-foreground">
-                                    Efficiency
-                                  </div>
-                                </div>
-                                <div className="text-center">
-                                  <div className="text-lg font-bold text-indigo-600">
-                                    {office.performance.uptime}%
-                                  </div>
-                                  <div className="text-xs text-muted-foreground">
-                                    Uptime
+                                    Machines
                                   </div>
                                 </div>
                                 <div className="text-center">
@@ -1110,13 +1083,13 @@ export default function CorporateDashboard() {
                           </div>
                           <div className="text-center">
                             <div className="text-3xl font-bold text-white">
-                              {officeData?.performance.efficiency || 0}%
+                              {Math.round((officeData?.performance.weeklyCups || 0) / 7)}
                             </div>
                             <div className="text-indigo-100">
-                              Office Efficiency
+                              Daily Average
                             </div>
                             <div className="text-xs text-indigo-200 mt-1">
-                              📊 Overall performance
+                              ☕ Cups per day
                             </div>
                           </div>
                         </>
