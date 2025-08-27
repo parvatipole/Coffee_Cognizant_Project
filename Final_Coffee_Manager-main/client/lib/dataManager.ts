@@ -185,4 +185,65 @@ export const dataManager = {
       alerts: frontendData.alerts || [],
     };
   },
+
+  // Sync machine data to shared storage for cross-user visibility
+  syncToSharedStorage: (machine: MachineData): void => {
+    try {
+      // Get existing shared machines
+      const stored = localStorage.getItem(STORAGE_KEYS.SHARED_MACHINES);
+      let sharedMachines = stored ? JSON.parse(stored) : [];
+
+      // Ensure sharedMachines is an array
+      if (!Array.isArray(sharedMachines)) {
+        sharedMachines = [];
+      }
+
+      // Filter out existing machine by both id and machineId
+      sharedMachines = sharedMachines.filter((m: any) => {
+        const matchesId = m.id === machine.id;
+        const matchesMachineId = machine.machineId && m.machineId === machine.machineId;
+        return !matchesId && !matchesMachineId;
+      });
+
+      // Add the updated machine
+      sharedMachines.push(machine);
+
+      // Save back to shared storage
+      localStorage.setItem(STORAGE_KEYS.SHARED_MACHINES, JSON.stringify(sharedMachines));
+      console.log(`🔄 DataManager: Synced machine ${machine.id} to shared storage for cross-user visibility`);
+    } catch (error) {
+      console.warn('Failed to sync machine to shared storage:', error);
+    }
+  },
+
+  // Get machine from shared storage (for admins to see technician updates)
+  getMachineFromSharedStorage: (id: string): MachineData | null => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEYS.SHARED_MACHINES);
+      if (!stored) return null;
+
+      const sharedMachines = JSON.parse(stored);
+      if (!Array.isArray(sharedMachines)) return null;
+
+      const found = sharedMachines.find((m: any) => m.id === id || m.machineId === id);
+      return found ? normalizeMachine(found) : null;
+    } catch (error) {
+      console.warn('Failed to get machine from shared storage:', error);
+      return null;
+    }
+  },
+
+  // Get all machines from shared storage
+  getAllMachinesFromSharedStorage: (): MachineData[] => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEYS.SHARED_MACHINES);
+      if (!stored) return [];
+
+      const sharedMachines = JSON.parse(stored);
+      return Array.isArray(sharedMachines) ? sharedMachines.map(normalizeMachine) : [];
+    } catch (error) {
+      console.warn('Failed to get machines from shared storage:', error);
+      return [];
+    }
+  },
 };
