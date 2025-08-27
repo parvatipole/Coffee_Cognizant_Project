@@ -86,19 +86,24 @@ npm test          # Run Vitest tests
 
 ## Backend Integration
 
-### Current Mode: Standalone
-The frontend currently runs in standalone mode with mock data and API responses.
+### Current Mode: Hybrid Development
+The frontend runs with an integrated development server that provides:
+- API structure and routing
+- Automatic fallback to mock data
+- Ready-to-implement endpoint stubs
 
-### Switching to Backend Integration
+### Backend Integration Process
 
-1. **Set Environment Variable**:
-   ```bash
-   # Disable standalone mode
-   VITE_STANDALONE_MODE=false
-   
-   # Set your backend API URL
-   VITE_API_BASE_URL=http://your-backend-url/api
+1. **Implement Endpoints**: Add real logic to `server/index.ts`
+   ```typescript
+   // Example: Replace 501 response with real implementation
+   app.get("/api/machines", async (req, res) => {
+     const machines = await database.getMachines();
+     res.json(machines);
+   });
    ```
+
+2. **No Frontend Changes Needed**: Frontend automatically detects and uses implemented endpoints
 
 2. **Backend API Requirements**:
    The frontend expects these API endpoints:
