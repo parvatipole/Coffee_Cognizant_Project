@@ -2,6 +2,7 @@ import "./global.css";
 import "./lib/errorHandler"; // Global error handling for demo mode
 import "./lib/rechartsSuppress"; // Suppress Recharts defaultProps warnings
 import "./lib/verifyStatusPersistence"; // Load status persistence verification
+import { dataManager } from "./lib/dataManager"; // Initialize data persistence
 
 import { Toaster } from "@/components/ui/toaster";
 import { createRoot } from "react-dom/client";
@@ -21,6 +22,9 @@ import FloatingNavigation, {
   QuickBackFab,
 } from "./components/FloatingNavigation";
 import ErrorBoundary from "./components/ErrorBoundary";
+
+// Initialize data manager for persistence across sessions
+dataManager.initialize();
 
 // Load development utilities in dev mode
 if (import.meta.env.DEV) {
