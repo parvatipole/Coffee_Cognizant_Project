@@ -27,7 +27,7 @@ public/                   # Static assets
 
 ## Key Features
 
-### ⚡ Hybrid Development Mode
+### ��� Hybrid Development Mode
 - Frontend works with integrated development server
 - Automatic fallback to mock data when backend endpoints not implemented
 - Seamless backend integration without configuration changes
@@ -76,7 +76,8 @@ The routing system is powered by React Router 6:
 ## Development Commands
 
 ```bash
-npm run dev        # Start development server
+npm run dev        # Start Vite + development server (recommended)
+npm run dev:server # Start only the API development server
 npm run build      # Production build
 npm run preview    # Preview production build
 npm run start      # Start production preview server
