@@ -638,29 +638,38 @@ export default function OfficeOverview() {
     );
   };
 
-  // Function to load and merge machine data
+  // Function to load machine data from dataManager (primary source)
   const loadMachineData = React.useCallback(() => {
-    const loadedMachines = getOfficeMachines();
-    // Also load any machines from shared storage for this office (to see technician changes)
-    const storedMachines = dataManager.getAllMachinesFromSharedStorage().filter(m => m.office === officeName);
-    console.log(`✅ OFFICE VIEW: Loading ${storedMachines.length} machines from shared storage for ${officeName}`);
-    const allMachines = [...loadedMachines];
+    // Primary data source: shared storage (includes all technician updates)
+    let storedMachines = dataManager.getAllMachinesFromSharedStorage().filter(m => m.office === officeName);
 
-    // REPLACE existing machines with updated versions, add new ones
-    storedMachines.forEach(stored => {
-      const existingIndex = allMachines.findIndex(m => m.id === stored.id);
-      if (existingIndex !== -1) {
-        // REPLACE existing machine with updated version
-        allMachines[existingIndex] = stored;
-        console.log(`🔄 OFFICE: Updated machine ${stored.id} status to ${stored.status}`);
-      } else {
-        // ADD new machine if it doesn't exist
-        allMachines.push(stored);
-        console.log(`➕ OFFICE: Added new machine ${stored.id}`);
-      }
+    // If no machines exist in storage for this office, initialize with demo data
+    if (storedMachines.length === 0) {
+      console.log(`📦 INITIALIZING: No machines found in storage for ${officeName}, loading demo data`);
+      const demoMachines = getOfficeMachines();
+
+      // Save demo machines to shared storage for future consistency
+      demoMachines.forEach(machine => {
+        dataManager.saveMachine({
+          ...machine,
+          // Ensure all required fields are present
+          electricityStatus: machine.electricityStatus || "available",
+          office: officeName,
+          alerts: machine.alerts || [],
+          recentRefills: machine.recentRefills || []
+        });
+      });
+
+      // Reload from storage after initialization
+      storedMachines = dataManager.getAllMachinesFromSharedStorage().filter(m => m.office === officeName);
+    }
+
+    console.log(`✅ OFFICE VIEW: Loaded ${storedMachines.length} machines from shared storage for ${officeName}`);
+    storedMachines.forEach(m => {
+      console.log(`  - ${m.id}: ${m.status} (power: ${m.powerStatus}, electricity: ${m.electricityStatus || 'N/A'})`);
     });
 
-    setMachines(allMachines);
+    setMachines(storedMachines);
   }, [officeName]);
 
   // Initialize machines on load
