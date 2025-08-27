@@ -20,21 +20,32 @@ import {
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Coffee, MapPin, Building, Zap } from 'lucide-react';
+import {
+  MACHINE_STATUS,
+  FILTER_STATUS,
+  CLEANING_STATUS,
+  SUPPLY_TYPES,
+  SUPPLY_NAMES,
+  SUPPLY_DEFAULTS,
+  VALIDATION
+} from '@/config';
+import { ALL_STRINGS } from '@/config/ui-strings';
+import { getAllOfficeNames } from '@/config/machines';
 
 interface MachineFormData {
   name: string;
   location: string;
   office: string;
-  status: 'operational' | 'maintenance' | 'offline';
+  status: typeof MACHINE_STATUS[keyof typeof MACHINE_STATUS];
   supplies: {
-    water: number;
-    milk: number;
-    coffeeBeans: number;
-    sugar: number;
+    [SUPPLY_TYPES.WATER]: number;
+    [SUPPLY_TYPES.MILK]: number;
+    [SUPPLY_TYPES.COFFEE_BEANS]: number;
+    [SUPPLY_TYPES.SUGAR]: number;
   };
   maintenance: {
-    filterStatus: 'good' | 'needs_replacement' | 'critical';
-    cleaningStatus: 'clean' | 'needs_cleaning' | 'overdue';
+    filterStatus: typeof FILTER_STATUS[keyof typeof FILTER_STATUS];
+    cleaningStatus: typeof CLEANING_STATUS[keyof typeof CLEANING_STATUS];
     pressure: number;
   };
   notes: string;
@@ -59,16 +70,16 @@ export default function AddMachineModal({
     name: '',
     location: '',
     office: selectedOffice || '',
-    status: 'operational',
+    status: MACHINE_STATUS.OPERATIONAL,
     supplies: {
-      water: 100,
-      milk: 100,
-      coffeeBeans: 100,
-      sugar: 100,
+      [SUPPLY_TYPES.WATER]: SUPPLY_DEFAULTS.DEFAULT_LEVEL,
+      [SUPPLY_TYPES.MILK]: SUPPLY_DEFAULTS.DEFAULT_LEVEL,
+      [SUPPLY_TYPES.COFFEE_BEANS]: SUPPLY_DEFAULTS.DEFAULT_LEVEL,
+      [SUPPLY_TYPES.SUGAR]: SUPPLY_DEFAULTS.DEFAULT_LEVEL,
     },
     maintenance: {
-      filterStatus: 'good',
-      cleaningStatus: 'clean',
+      filterStatus: FILTER_STATUS.GOOD,
+      cleaningStatus: CLEANING_STATUS.CLEAN,
       pressure: 15,
     },
     notes: '',
@@ -127,16 +138,16 @@ export default function AddMachineModal({
         name: '',
         location: '',
         office: selectedOffice || '',
-        status: 'operational',
+        status: MACHINE_STATUS.OPERATIONAL,
         supplies: {
-          water: 100,
-          milk: 100,
-          coffeeBeans: 100,
-          sugar: 100,
+          [SUPPLY_TYPES.WATER]: SUPPLY_DEFAULTS.DEFAULT_LEVEL,
+          [SUPPLY_TYPES.MILK]: SUPPLY_DEFAULTS.DEFAULT_LEVEL,
+          [SUPPLY_TYPES.COFFEE_BEANS]: SUPPLY_DEFAULTS.DEFAULT_LEVEL,
+          [SUPPLY_TYPES.SUGAR]: SUPPLY_DEFAULTS.DEFAULT_LEVEL,
         },
         maintenance: {
-          filterStatus: 'good',
-          cleaningStatus: 'clean',
+          filterStatus: FILTER_STATUS.GOOD,
+          cleaningStatus: CLEANING_STATUS.CLEAN,
           pressure: 15,
         },
         notes: '',
@@ -150,7 +161,7 @@ export default function AddMachineModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Coffee className="w-5 h-5 text-primary" />
-            Add New Coffee Machine
+            {ALL_STRINGS.MACHINE.ADD_MACHINE}
           </DialogTitle>
           <DialogDescription>
             {selectedOffice
@@ -170,32 +181,41 @@ export default function AddMachineModal({
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Machine Name *</Label>
+                <Label htmlFor="name">{ALL_STRINGS.MACHINE.MACHINE_NAME} *</Label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  placeholder="e.g., Coffee Station Alpha"
+                  placeholder={ALL_STRINGS.MACHINE.MACHINE_NAME_PLACEHOLDER}
                   required
+                  maxLength={VALIDATION.MACHINE_NAME_MAX_LENGTH}
                 />
               </div>
 
               {!selectedOffice && (
                 <div className="space-y-2">
-                  <Label htmlFor="office">Office *</Label>
-                  <Input
-                    id="office"
+                  <Label htmlFor="office">{ALL_STRINGS.MACHINE.OFFICE} *</Label>
+                  <Select
                     value={formData.office}
-                    onChange={(e) => handleInputChange('office', e.target.value)}
-                    placeholder="e.g., Hinjewadi IT Park"
-                    required
-                  />
+                    onValueChange={(value) => handleInputChange('office', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={ALL_STRINGS.MACHINE.OFFICE_PLACEHOLDER} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {getAllOfficeNames().map((officeName) => (
+                        <SelectItem key={officeName} value={officeName}>
+                          {officeName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               )}
 
               {selectedOffice && (
                 <div className="space-y-2">
-                  <Label htmlFor="office">Office</Label>
+                  <Label htmlFor="office">{ALL_STRINGS.MACHINE.OFFICE}</Label>
                   <Input
                     id="office"
                     value={selectedOffice}
@@ -210,12 +230,12 @@ export default function AddMachineModal({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="location">Specific Location *</Label>
+              <Label htmlFor="location">{ALL_STRINGS.MACHINE.LOCATION} *</Label>
               <Input
                 id="location"
                 value={formData.location}
                 onChange={(e) => handleInputChange('location', e.target.value)}
-                placeholder="e.g., Building A2, Ground Floor"
+                placeholder={ALL_STRINGS.MACHINE.LOCATION_PLACEHOLDER}
                 required
               />
             </div>
@@ -224,7 +244,7 @@ export default function AddMachineModal({
               <Label htmlFor="status">Initial Status</Label>
               <Select
                 value={formData.status}
-                onValueChange={(value: 'operational' | 'maintenance' | 'offline') =>
+                onValueChange={(value: typeof MACHINE_STATUS[keyof typeof MACHINE_STATUS]) =>
                   handleInputChange('status', value)
                 }
               >
@@ -232,22 +252,22 @@ export default function AddMachineModal({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="operational">
+                  <SelectItem value={MACHINE_STATUS.OPERATIONAL}>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full" />
-                      Operational
+                      {ALL_STRINGS.MACHINE.STATUS_OPERATIONAL}
                     </div>
                   </SelectItem>
-                  <SelectItem value="maintenance">
+                  <SelectItem value={MACHINE_STATUS.MAINTENANCE}>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-orange-500 rounded-full" />
-                      Maintenance
+                      {ALL_STRINGS.MACHINE.STATUS_MAINTENANCE}
                     </div>
                   </SelectItem>
-                  <SelectItem value="offline">
+                  <SelectItem value={MACHINE_STATUS.OFFLINE}>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-red-500 rounded-full" />
-                      Offline
+                      {ALL_STRINGS.MACHINE.STATUS_OFFLINE}
                     </div>
                   </SelectItem>
                 </SelectContent>
@@ -259,14 +279,14 @@ export default function AddMachineModal({
           <div className="space-y-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Zap className="w-4 h-4" />
-              Initial Supply Levels (%)
+              {ALL_STRINGS.MACHINE.SUPPLY_LEVELS} ({ALL_STRINGS.UI.PERCENT})
             </h3>
-            
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {Object.entries(formData.supplies).map(([supply, value]) => (
                 <div key={supply} className="space-y-2">
                   <Label htmlFor={supply}>
-                    {supply === 'coffeeBeans' ? 'Coffee Beans' : supply.charAt(0).toUpperCase() + supply.slice(1)}
+                    {SUPPLY_NAMES[supply as keyof typeof SUPPLY_NAMES] || supply}
                   </Label>
                   <Input
                     id={supply}
@@ -285,15 +305,15 @@ export default function AddMachineModal({
           <div className="space-y-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <MapPin className="w-4 h-4" />
-              Maintenance Configuration
+              {ALL_STRINGS.MACHINE.MAINTENANCE} Configuration
             </h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="filterStatus">Filter Status</Label>
+                <Label htmlFor="filterStatus">{ALL_STRINGS.MACHINE.FILTER_STATUS}</Label>
                 <Select
                   value={formData.maintenance.filterStatus}
-                  onValueChange={(value: 'good' | 'needs_replacement' | 'critical') =>
+                  onValueChange={(value: typeof FILTER_STATUS[keyof typeof FILTER_STATUS]) =>
                     handleMaintenanceChange('filterStatus', value)
                   }
                 >
@@ -301,18 +321,18 @@ export default function AddMachineModal({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="good">Good</SelectItem>
-                    <SelectItem value="needs_replacement">Needs Replacement</SelectItem>
-                    <SelectItem value="critical">Critical</SelectItem>
+                    <SelectItem value={FILTER_STATUS.GOOD}>{ALL_STRINGS.MACHINE.FILTER_GOOD}</SelectItem>
+                    <SelectItem value={FILTER_STATUS.NEEDS_REPLACEMENT}>{ALL_STRINGS.MACHINE.FILTER_NEEDS_REPLACEMENT}</SelectItem>
+                    <SelectItem value={FILTER_STATUS.CRITICAL}>{ALL_STRINGS.MACHINE.FILTER_CRITICAL}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="cleaningStatus">Cleaning Status</Label>
+                <Label htmlFor="cleaningStatus">{ALL_STRINGS.MACHINE.CLEANING_STATUS}</Label>
                 <Select
                   value={formData.maintenance.cleaningStatus}
-                  onValueChange={(value: 'clean' | 'needs_cleaning' | 'overdue') =>
+                  onValueChange={(value: typeof CLEANING_STATUS[keyof typeof CLEANING_STATUS]) =>
                     handleMaintenanceChange('cleaningStatus', value)
                   }
                 >
@@ -320,21 +340,20 @@ export default function AddMachineModal({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="clean">Clean</SelectItem>
-                    <SelectItem value="needs_cleaning">Needs Cleaning</SelectItem>
-                    <SelectItem value="overdue">Overdue</SelectItem>
+                    <SelectItem value={CLEANING_STATUS.CLEAN}>{ALL_STRINGS.MACHINE.CLEANING_CLEAN}</SelectItem>
+                    <SelectItem value={CLEANING_STATUS.NEEDS_CLEANING}>{ALL_STRINGS.MACHINE.CLEANING_NEEDS_CLEANING}</SelectItem>
+                    <SelectItem value={CLEANING_STATUS.OVERDUE}>{ALL_STRINGS.MACHINE.CLEANING_OVERDUE}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-
               <div className="space-y-2">
-                <Label htmlFor="pressure">Operating Pressure (bar)</Label>
+                <Label htmlFor="pressure">{ALL_STRINGS.MACHINE.PRESSURE} (bar)</Label>
                 <Input
                   id="pressure"
                   type="number"
-                  min="10"
-                  max="20"
+                  min={SUPPLY_DEFAULTS.MIN_PRESSURE}
+                  max={SUPPLY_DEFAULTS.MAX_PRESSURE}
                   value={formData.maintenance.pressure}
                   onChange={(e) => handleMaintenanceChange('pressure', parseInt(e.target.value) || 15)}
                 />
@@ -344,25 +363,29 @@ export default function AddMachineModal({
 
           {/* Notes */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Installation Notes</h3>
+            <h3 className="text-lg font-semibold">Installation {ALL_STRINGS.MACHINE.NOTES}</h3>
             <Textarea
               value={formData.notes}
               onChange={(e) => handleInputChange('notes', e.target.value)}
-              placeholder="Add any installation notes, special instructions, or observations..."
+              placeholder={ALL_STRINGS.MACHINE.NOTES_PLACEHOLDER}
               className="min-h-[80px]"
+              maxLength={VALIDATION.NOTES_MAX_LENGTH}
             />
+            <div className="text-xs text-gray-500 text-right">
+              {formData.notes.length}/{VALIDATION.NOTES_MAX_LENGTH}
+            </div>
           </div>
 
           <DialogFooter className="gap-3">
             <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
+              {ALL_STRINGS.FORM.CANCEL}
             </Button>
             <Button
               type="submit"
               disabled={!isFormValid || isLoading}
               className="bg-gradient-to-r from-primary to-primary/80"
             >
-              {isLoading ? 'Adding Machine...' : 'Add Machine'}
+              {isLoading ? ALL_STRINGS.FORM.SAVING : ALL_STRINGS.MACHINE.ADD_MACHINE}
             </Button>
           </DialogFooter>
         </form>
