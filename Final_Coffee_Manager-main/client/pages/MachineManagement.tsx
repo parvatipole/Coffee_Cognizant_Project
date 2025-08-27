@@ -791,7 +791,9 @@ export default function MachineManagement({
                   ? (machineId && user?.officeName
                       ? `/office/${officeNameToPath(user.officeName)}`
                       : "/dashboard")
-                  : "/dashboard" // Admins go back to location selection
+                  : (machineData.office || officePath)
+                      ? `/office/${officeNameToPath(machineData.office || pathToOfficeName(officePath || ""))}`
+                      : "/dashboard" // Fallback if no office info available
               }
               className="flex-1"
             />
