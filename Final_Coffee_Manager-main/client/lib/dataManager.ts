@@ -153,6 +153,11 @@ export const dataManager = {
     const machines = dataManager.getAllMachines();
     const filteredMachines = machines.filter(m => m.id !== id && m.machineId !== id);
     localStorage.setItem(STORAGE_KEYS.MACHINES, JSON.stringify(filteredMachines));
+
+    // Also remove from shared storage for cross-user visibility
+    const sharedMachines = JSON.parse(localStorage.getItem(STORAGE_KEYS.SHARED_MACHINES) || '[]');
+    const filteredSharedMachines = sharedMachines.filter((m: any) => m.id !== id && m.machineId !== id);
+    localStorage.setItem(STORAGE_KEYS.SHARED_MACHINES, JSON.stringify(filteredSharedMachines));
   },
 
   // Clear all data
