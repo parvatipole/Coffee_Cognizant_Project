@@ -618,8 +618,9 @@ export default function MachineManagement({
     // Update local state immediately
     setMachineData(updatedData);
 
-    // Save to localStorage immediately
+    // Save to localStorage immediately - THIS CHANGE IS PERMANENT
     dataManager.saveMachine(updatedData);
+    console.log(`🔒 PERMANENT CHANGE: Machine ${machineData.id} electricity status changed to "${newElectricityStatus}" (machine status: "${newStatus}") - Admin will see this!`);
 
     try {
       // Save to backend
@@ -730,8 +731,9 @@ export default function MachineManagement({
     // Update local state immediately
     setMachineData(updatedData);
 
-    // Save to localStorage immediately
+    // Save to localStorage immediately - THIS CHANGE IS PERMANENT
     dataManager.saveMachine(updatedData);
+    console.log(`🔒 PERMANENT CHANGE: Machine ${machineData.id} power status changed to "${newStatus}" - Admin will see this!`);
 
     try {
       // Save to backend
