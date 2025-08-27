@@ -227,7 +227,7 @@ export const dataManager = {
 
       // Save back to shared storage
       localStorage.setItem(STORAGE_KEYS.SHARED_MACHINES, JSON.stringify(sharedMachines));
-      console.log(`🔄 DataManager: Synced machine ${machine.id} to shared storage for cross-user visibility`);
+      console.log(`🔄 TECHNICIAN UPDATE: Synced machine ${machine.id} to shared storage - Admin will see this change!`);
     } catch (error) {
       console.warn('Failed to sync machine to shared storage:', error);
     }
