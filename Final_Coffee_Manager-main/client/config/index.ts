@@ -215,6 +215,7 @@ export const API_ENDPOINTS = {
   MACHINE_BY_ID: (id: string) => `/machines/${id}`,
   MACHINE_BY_MACHINE_ID: (machineId: string) => `/machines/machine/${machineId}`,
   MACHINE_SUPPLIES: (id: string) => `/machines/${id}/supplies`,
+  DELETE_MACHINE: (id: string) => `/machines/${id}`,
   
   // Locations
   LOCATIONS: "/machines/locations",
@@ -248,6 +249,7 @@ export const SUCCESS_MESSAGES = {
   MACHINE_SAVED: "Machine data saved successfully.",
   SUPPLIES_UPDATED: "Supply levels updated successfully.",
   REFILL_COMPLETED: "Refill completed successfully.",
+  MACHINE_DELETED: "Machine deleted permanently.",
   ALERT_RESOLVED: "Alert marked as resolved.",
   LOGIN_SUCCESS: "Logged in successfully.",
   LOGOUT_SUCCESS: "Logged out successfully.",
