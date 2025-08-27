@@ -91,6 +91,7 @@ export default function MachineManagement({
   const [selectedSupply, setSelectedSupply] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isEditingElectricity, setIsEditingElectricity] = useState(false);
+  const [isLoadingMachine, setIsLoadingMachine] = useState(true);
 
   // Generate dynamic alerts based on machine condition
   const generateDynamicAlerts = (machine: MachineData): any[] => {
@@ -414,10 +415,13 @@ export default function MachineManagement({
   // Load machine data from dataManager (shared storage first, then fallback)
   useEffect(() => {
     const loadMachineData = async () => {
+      setIsLoadingMachine(true);
+
       if (!machineId) {
         // Legacy behavior for when no machineId is provided
         const officeData = getOfficeMachineData();
         setMachineData(officeData);
+        setIsLoadingMachine(false);
         return;
       }
 
@@ -464,6 +468,8 @@ export default function MachineManagement({
         }
       } catch (error) {
         console.error("MACHINE DETAIL: Failed to load machine data:", error);
+      } finally {
+        setIsLoadingMachine(false);
       }
     };
 
@@ -517,7 +523,7 @@ export default function MachineManagement({
     }
   };
 
-  const supplies = [
+  const supplies = machineData ? [
     {
       name: "Water",
       key: "water",
@@ -550,7 +556,7 @@ export default function MachineManagement({
       unit: "kg",
       cost: 30,
     },
-  ];
+  ] : [];
 
   const handleSave = async () => {
     setIsLoading(true);
