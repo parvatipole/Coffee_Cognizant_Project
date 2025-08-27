@@ -848,12 +848,29 @@ export default function OfficeOverview() {
             >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
-                  <div>
+                  <div className="flex-1">
                     <CardTitle className="text-lg">{machine.name}</CardTitle>
                     <CardDescription className="flex items-center gap-1 mt-1">
                       <MapPin className="w-3 h-3" />
                       {machine.location}
                     </CardDescription>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3 h-3 rounded-full ${
+                      machine.status === "operational" ? "bg-green-500" :
+                      machine.status === "maintenance" ? "bg-orange-500" : "bg-red-500"
+                    }`} />
+                    <Badge
+                      className={
+                        machine.status === "operational"
+                          ? "bg-green-100 text-green-700"
+                          : machine.status === "maintenance"
+                            ? "bg-orange-100 text-orange-700"
+                            : "bg-red-100 text-red-700"
+                      }
+                    >
+                      {machine.status === "offline" ? "Not Functional" : machine.status}
+                    </Badge>
                   </div>
                 </div>
               </CardHeader>

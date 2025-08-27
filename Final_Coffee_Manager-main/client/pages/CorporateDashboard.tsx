@@ -1218,7 +1218,7 @@ export default function CorporateDashboard() {
                                   : "bg-red-100 text-red-700"
                             }
                           >
-                            {machine.status}
+                            {machine.status === "offline" ? "Not Functional" : machine.status}
                           </Badge>
                         </div>
                       </div>
