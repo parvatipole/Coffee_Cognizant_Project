@@ -64,10 +64,13 @@ export const dataManager = {
   // Save machine data to localStorage
   saveMachine: (machine: MachineData): void => {
     const existingMachines = dataManager.getAllMachines();
-    // Filter out existing machine by both id and machineId to prevent duplicates
-    const updatedMachines = existingMachines.filter(m =>
-      m.id !== machine.id && (machine.machineId ? m.machineId !== machine.machineId : true)
-    );
+    // Filter out any existing machine that matches either id or machineId to prevent duplicates
+    const updatedMachines = existingMachines.filter(m => {
+      const matchesId = m.id === machine.id;
+      const matchesMachineId = machine.machineId && m.machineId === machine.machineId;
+      return !matchesId && !matchesMachineId;
+    });
+
     // Ensure normalized supplies before saving
     const normalized = normalizeMachine(machine);
     updatedMachines.push(normalized);
