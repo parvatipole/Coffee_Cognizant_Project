@@ -42,8 +42,12 @@ import {
   Cpu,
   Droplets,
   Plus,
+  Trash2,
 } from "lucide-react";
 import AddMachineModal from "@/components/AddMachineModal";
+import DeleteMachineDialog from "@/components/DeleteMachineDialog";
+import { toast } from "sonner";
+import { SUCCESS_MESSAGES } from "@/config";
 
 interface NavigationStep {
   id: string;
@@ -111,6 +115,11 @@ export default function CorporateDashboard() {
   // Add Machine Modal state
   const [isAddMachineModalOpen, setIsAddMachineModalOpen] = useState(false);
   const [isAddingMachine, setIsAddingMachine] = useState(false);
+
+  // Delete Machine Modal state
+  const [isDeleteMachineDialogOpen, setIsDeleteMachineDialogOpen] = useState(false);
+  const [machineToDelete, setMachineToDelete] = useState<MachineData | null>(null);
+  const [isDeletingMachine, setIsDeletingMachine] = useState(false);
 
   // Streamlined 3-step process: Location → Office → Machine
   const steps: NavigationStep[] = [
@@ -1247,6 +1256,24 @@ export default function CorporateDashboard() {
                           className="h-2"
                         />
                       </div>
+
+                      {/* Admin Controls */}
+                      {user?.role === "admin" && (
+                        <div className="pt-2 border-t border-gray-100">
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="w-full gap-2 text-xs"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteMachine(machine);
+                            }}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            Delete Machine
+                          </Button>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 ))}
