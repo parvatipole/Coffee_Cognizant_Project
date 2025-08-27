@@ -887,7 +887,9 @@ export default function MachineManagement({
                     <div className={`w-3 h-3 rounded-full ${getStatusColor(machineData.status)}`} />
                     <span className="capitalize text-sm font-medium">
                       {machineData.status === "offline" && machineData.electricityStatus === "unavailable"
-                        ? "Not Operational (No Electricity)"
+                        ? "Not Functional (No Electricity)"
+                        : machineData.status === "offline"
+                        ? "Not Functional"
                         : machineData.status}
                     </span>
                   </div>
