@@ -856,8 +856,6 @@ export default function OfficeOverview() {
                   ? () => {
                       // For technicians, back button should sign them out
                       console.log('Technician navigating back: signing out');
-                      // Import logout function from useAuth
-                      const { logout } = require('@/contexts/AuthContext').useAuth();
                       logout();
                     }
                   : undefined
