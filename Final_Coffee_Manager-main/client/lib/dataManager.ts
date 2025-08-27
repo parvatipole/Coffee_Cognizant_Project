@@ -71,6 +71,13 @@ if (typeof window !== 'undefined') {
     };
   };
   console.log('🔧 DEBUG: Use window.debugCoffeeMachines() to debug storage state');
+
+  // Also import persistence test utility
+  import('./persistenceTest').then(module => {
+    console.log('🧪 TESTING: Persistence test utilities loaded');
+  }).catch(err => {
+    console.warn('Failed to load persistence test utilities:', err);
+  });
 }
 
 export const dataManager = {
