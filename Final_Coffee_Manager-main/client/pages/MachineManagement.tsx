@@ -578,6 +578,54 @@ export default function MachineManagement({
     }
   };
 
+  const handleElectricityStatusChange = async (newElectricityStatus: "available" | "unavailable") => {
+    if (!canEdit) return;
+
+    // Determine new machine status based on electricity
+    let newStatus = machineData.status;
+    let newPowerStatus = machineData.powerStatus;
+
+    if (newElectricityStatus === "unavailable") {
+      newStatus = "offline";
+      newPowerStatus = "offline";
+    } else if (newElectricityStatus === "available" && machineData.status === "offline") {
+      newStatus = "operational";
+      newPowerStatus = "online";
+    }
+
+    const updatedData = {
+      ...machineData,
+      electricityStatus: newElectricityStatus,
+      status: newStatus,
+      powerStatus: newPowerStatus,
+      lastPowerUpdate: new Date().toLocaleString("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }),
+    };
+
+    // Update local state immediately
+    setMachineData(updatedData);
+
+    // Save to localStorage immediately
+    dataManager.saveMachine(updatedData);
+
+    try {
+      // Save to backend
+      const backendData = dataManager.mapFrontendToBackend(updatedData);
+      await apiClient.updateMachine(machineData.id, backendData);
+      console.log('Electricity status updated in backend successfully');
+    } catch (error) {
+      console.log('Backend unavailable, saved electricity status locally:', error.message);
+    }
+
+    setIsEditingElectricity(false);
+  };
+
   const handleSupplyRefill = async (supplyKey: string, amount: number) => {
     const currentValue = machineData.supplies[supplyKey as keyof typeof machineData.supplies] || 0;
     const newValue = Math.min(100, currentValue + amount);
