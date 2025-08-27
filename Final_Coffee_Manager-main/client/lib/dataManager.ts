@@ -310,32 +310,52 @@ export const dataManager = {
     }
   },
 
-  // Get all machines from shared storage
+  // Get all machines from shared storage (authoritative data source)
   getAllMachinesFromSharedStorage: (): MachineData[] => {
     try {
       const stored = localStorage.getItem(STORAGE_KEYS.SHARED_MACHINES);
       if (!stored) {
         // Initialize with demo data if shared storage is empty
-        console.log('📦 FIRST TIME: Initializing shared storage with demo machines for cross-user sync');
+        console.log('🚀 INITIALIZING: Setting up shared storage with demo machines for cross-user sync');
         const { generateDemoMachines } = require('@/config/machines');
         const demoMachines = generateDemoMachines();
-        localStorage.setItem(STORAGE_KEYS.SHARED_MACHINES, JSON.stringify(demoMachines));
-        return demoMachines.map(normalizeMachine);
+
+        // Ensure each machine has all required fields for consistency
+        const normalizedDemoMachines = demoMachines.map(machine => ({
+          ...machine,
+          electricityStatus: machine.electricityStatus || "available",
+          alerts: machine.alerts || [],
+          recentRefills: machine.recentRefills || [],
+          lastUpdated: new Date().toISOString(),
+          updatedBy: 'system'
+        }));
+
+        localStorage.setItem(STORAGE_KEYS.SHARED_MACHINES, JSON.stringify(normalizedDemoMachines));
+        console.log(`✅ INITIALIZED: Created ${normalizedDemoMachines.length} demo machines in shared storage`);
+        return normalizedDemoMachines.map(normalizeMachine);
       }
 
       const sharedMachines = JSON.parse(stored);
-      const machines = Array.isArray(sharedMachines) ? sharedMachines.map(normalizeMachine) : [];
+      if (!Array.isArray(sharedMachines)) {
+        console.warn('⚠️ SHARED STORAGE: Invalid data format, reinitializing...');
+        localStorage.removeItem(STORAGE_KEYS.SHARED_MACHINES);
+        return dataManager.getAllMachinesFromSharedStorage(); // Recursive call to reinitialize
+      }
+
+      const machines = sharedMachines.map(normalizeMachine);
 
       // Enhanced logging for debugging
-      console.log(`📊 SHARED STORAGE: Loaded ${machines.length} machines from shared storage`);
+      console.log(`📊 SHARED STORAGE: Loaded ${machines.length} machines`);
       machines.forEach(m => {
-        console.log(`  - ${m.id}: ${m.status} (power: ${m.powerStatus}, electricity: ${m.electricityStatus})`);
+        console.log(`  - ${m.id}: ${m.status} (power: ${m.powerStatus}, electricity: ${m.electricityStatus || 'N/A'})`);
       });
 
       return machines;
     } catch (error) {
-      console.warn('Failed to get machines from shared storage:', error);
-      return [];
+      console.error('Failed to get machines from shared storage:', error);
+      // Clear corrupted data and reinitialize
+      localStorage.removeItem(STORAGE_KEYS.SHARED_MACHINES);
+      return dataManager.getAllMachinesFromSharedStorage(); // Recursive call to reinitialize
     }
   },
 
