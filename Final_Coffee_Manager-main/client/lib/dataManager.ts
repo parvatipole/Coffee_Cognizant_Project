@@ -143,8 +143,9 @@ export const dataManager = {
       machines[machineIndex] = updated;
       localStorage.setItem(STORAGE_KEYS.MACHINES, JSON.stringify(machines));
 
-      // Also sync to shared storage for cross-user visibility
+      // Also sync to shared storage for cross-user visibility (so admin sees changes)
       dataManager.syncToSharedStorage(updated);
+      console.log(`🔄 MACHINE UPDATE: Updated machine ${id} synced to shared storage`);
     }
   },
 
