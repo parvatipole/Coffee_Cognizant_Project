@@ -4,18 +4,42 @@ This document outlines how to integrate your backend with the Coffee Manager fro
 
 ## Current Status
 
-✅ **Frontend**: Fully functional in standalone mode  
+✅ **Frontend**: Fully functional with development server  
+✅ **Development Server**: Minimal server for Vite integration  
 ⏳ **Backend**: Ready for integration
+
+## Hybrid Development Approach
+
+The current setup provides:
+1. **Development Server**: Minimal Express server that integrates with Vite
+2. **Automatic Fallback**: Falls back to frontend-only mode when backend endpoints aren't implemented
+3. **Seamless Integration**: Easy to add real backend endpoints without changing frontend code
 
 ## Quick Setup
 
-1. **Frontend is ready** - runs independently with mock data
-2. **To integrate your backend**:
-   - Set `VITE_STANDALONE_MODE=false`
-   - Set `VITE_API_BASE_URL=your-backend-url/api`
-   - Implement the required API endpoints below
+### Current Development Mode
+```bash
+npm run dev  # Starts Vite + development server
+```
+
+### Backend Integration Process
+1. **Implement API endpoints** (see below)
+2. **No frontend changes needed** - automatic detection
+3. **Frontend automatically uses backend** when endpoints return real data
+
+## How It Works
+
+```
+Frontend Request → Development Server → Backend (if implemented)
+                                   ↓
+                               Returns 501 "Not Implemented"
+                                   ↓
+                          Frontend uses standalone mode
+```
 
 ## Required API Endpoints
+
+When you implement these endpoints in the development server, they'll automatically be used:
 
 ### Authentication
 ```http
@@ -151,6 +175,38 @@ Authorization: Bearer {token}
 Response: Machine[] // Machines needing maintenance
 ```
 
+## Implementation Steps
+
+### 1. Add Endpoint to Development Server
+
+Edit `server/index.ts` and add your endpoint:
+
+```typescript
+// Example: Implement the machines endpoint
+app.get("/api/machines", authenticateToken, async (req, res) => {
+  try {
+    // Your database logic here
+    const machines = await getMachinesFromDatabase();
+    res.json(machines);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+```
+
+### 2. No Frontend Changes Needed
+
+The frontend automatically detects when an endpoint is implemented and starts using it instead of mock data.
+
+### 3. Test Integration
+
+```bash
+# Start development server
+npm run dev
+
+# Frontend will automatically use your implemented endpoints
+```
+
 ## Data Models
 
 ### Machine
@@ -217,52 +273,32 @@ interface Refill {
 }
 ```
 
-## Key Notes
+## Benefits of This Approach
 
-1. **Frontend Key Mapping**: 
-   - Frontend uses `coffeeBeans` but backend should use `coffee`
-   - The frontend automatically handles this mapping
+1. **No Configuration Changes**: Frontend automatically detects backend availability
+2. **Gradual Implementation**: Implement endpoints one by one
+3. **Always Working**: Frontend works even with partial backend implementation
+4. **Easy Testing**: Real backend integration without complex setup
+5. **Production Ready**: Same code works in development and production
 
-2. **Authentication**:
-   - JWT tokens in Authorization header
-   - Frontend handles token storage and expiration
-
-3. **Error Handling**:
-   - Return proper HTTP status codes
-   - Include error messages in response body
-   - 401 for authentication errors
-
-4. **CORS**:
-   - Enable CORS for your frontend domain
-   - Allow credentials for authentication
-
-## Environment Setup
-
-Backend developers should know the frontend expects:
+## Environment Variables
 
 ```bash
-# When backend is ready
-VITE_STANDALONE_MODE=false
-VITE_API_BASE_URL=http://your-backend-url/api
+# Optional - for external backend
+VITE_API_BASE_URL=http://your-external-backend/api
+
+# Optional - force standalone mode
+VITE_STANDALONE_MODE=true
 ```
 
-## Testing Integration
+## Development Commands
 
-1. Set environment variables
-2. Start your backend server
-3. Start frontend with `npm run dev`
-4. Frontend will automatically switch from standalone to backend mode
-
-## Alert Generation Logic
-
-The frontend generates alerts automatically based on:
-- Supply levels < 20%
-- Electricity status = "unavailable" 
-- Filter status = "needs_replacement"
-- Cleaning status = "needs_cleaning"
-
-Your backend can override this by providing alerts in the machine data.
+```bash
+npm run dev              # Start Vite + development server (recommended)
+npm run dev:server       # Start only the development server on port 8080
+npm run build           # Build for production
+```
 
 ## Questions?
 
-The frontend is designed to be completely independent and backend-agnostic. Any standard REST API that implements the above endpoints will work seamlessly.
+This hybrid approach ensures the frontend always works while making backend integration seamless. Just implement the endpoints in `server/index.ts` and the frontend will automatically start using them!
