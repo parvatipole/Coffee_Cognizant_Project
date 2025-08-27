@@ -93,6 +93,7 @@ export const dataManager = {
   getMachine: (id: string): MachineData | null => {
     const machines = dataManager.getAllMachines();
     const found = machines.find(m => m.id === id || m.machineId === id) || null;
+    console.log(`🔍 DataManager: Looking for machine with id/machineId "${id}". Found: ${found ? `${found.id} (${found.machineId})` : 'null'}`);
     return found ? normalizeMachine(found) : null;
   },
 
