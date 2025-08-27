@@ -66,12 +66,13 @@ export const dataManager = {
     const existingMachines = dataManager.getAllMachines();
     // Filter out existing machine by both id and machineId to prevent duplicates
     const updatedMachines = existingMachines.filter(m =>
-      m.id !== machine.id && m.machineId !== machine.machineId
+      m.id !== machine.id && (machine.machineId ? m.machineId !== machine.machineId : true)
     );
     // Ensure normalized supplies before saving
     const normalized = normalizeMachine(machine);
     updatedMachines.push(normalized);
 
+    console.log(`💾 DataManager: Saving machine ${machine.id}${machine.machineId ? ` (${machine.machineId})` : ''} to localStorage`);
     localStorage.setItem(STORAGE_KEYS.MACHINES, JSON.stringify(updatedMachines));
     localStorage.setItem(STORAGE_KEYS.LAST_SYNC, new Date().toISOString());
   },
