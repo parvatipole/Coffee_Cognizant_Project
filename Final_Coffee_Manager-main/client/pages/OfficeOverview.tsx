@@ -692,6 +692,16 @@ export default function OfficeOverview() {
       }
     };
 
+    const handleMachineDataChanged = (e: CustomEvent) => {
+      console.log('🔄 CUSTOM EVENT: Machine data changed event received:', e.detail);
+      loadMachineData();
+    };
+
+    const handleForceRefresh = () => {
+      console.log('🔄 FORCE REFRESH: Force refresh event received');
+      loadMachineData();
+    };
+
     // Listen for storage events (for cross-tab/cross-session changes)
     window.addEventListener('storage', handleStorageChange);
 
@@ -700,6 +710,10 @@ export default function OfficeOverview() {
 
     // Listen for visibility changes
     document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Listen for custom events from dataManager
+    window.addEventListener('machineDataChanged', handleMachineDataChanged as EventListener);
+    window.addEventListener('forceRefreshMachines', handleForceRefresh);
 
     // Also poll for changes periodically (as storage events don't fire within same tab)
     const intervalId = setInterval(() => {
@@ -710,6 +724,8 @@ export default function OfficeOverview() {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('focus', handleWindowFocus);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('machineDataChanged', handleMachineDataChanged as EventListener);
+      window.removeEventListener('forceRefreshMachines', handleForceRefresh);
       clearInterval(intervalId);
     };
   }, [loadMachineData]);
@@ -940,7 +956,7 @@ export default function OfficeOverview() {
                             : "bg-red-100 text-red-700"
                       }
                     >
-                      {machine.status === "offline" ? "Not Functional" : machine.status}
+                      {machine.status === "offline" || machine.powerStatus === "offline" ? "Not Functional" : machine.status}
                     </Badge>
                   </div>
                 </div>
