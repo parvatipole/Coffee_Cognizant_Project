@@ -876,6 +876,13 @@ export default function OfficeOverview() {
               </CardHeader>
 
               <CardContent className="space-y-4">
+                {machine.status === "offline" && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+                    <p className="text-sm text-red-800 font-medium flex items-center gap-2">
+                      ⚠️ Machine is not operational
+                    </p>
+                  </div>
+                )}
                 {/* Supplies */}
                 <div className="space-y-2">
                   <div className="text-sm font-medium">Supply Levels</div>

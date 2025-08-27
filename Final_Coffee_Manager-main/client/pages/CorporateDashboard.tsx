@@ -1000,7 +1000,7 @@ export default function CorporateDashboard() {
                               </div>
                               <div className="text-blue-100">Active Alerts</div>
                               <div className="text-xs text-blue-200 mt-1">
-                                ⚠️ Requires attention
+                                ⚠��� Requires attention
                               </div>
                             </div>
                           </>
@@ -1225,6 +1225,11 @@ export default function CorporateDashboard() {
                       <p className="text-sm text-muted-foreground font-mono">
                         {machine.id}
                       </p>
+                      {machine.status === "offline" && (
+                        <p className="text-sm text-red-600 font-medium mt-1">
+                          ⚠️ Machine is not operational
+                        </p>
+                      )}
                     </CardHeader>
                     <CardContent className="space-y-4">
                       {/* Performance Metrics */}
