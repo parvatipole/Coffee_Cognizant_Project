@@ -849,7 +849,18 @@ export default function OfficeOverview() {
               backUrl={
                 user?.role === "admin"
                   ? "/dashboard" // Admins go back to location selection (Pune/Mumbai page)
-                  : "/dashboard" // Technicians go back to their machine overview
+                  : undefined // Technicians will use onBack to sign out
+              }
+              onBack={
+                user?.role === "technician"
+                  ? () => {
+                      // For technicians, back button should sign them out
+                      console.log('Technician navigating back: signing out');
+                      // Import logout function from useAuth
+                      const { logout } = require('@/contexts/AuthContext').useAuth();
+                      logout();
+                    }
+                  : undefined
               }
               className="flex-1"
             />
