@@ -678,16 +678,38 @@ export default function OfficeOverview() {
       }
     };
 
+    const handleWindowFocus = () => {
+      // Refresh data when window gains focus (returning from machine management)
+      console.log('🔄 FOCUS REFRESH: Window focused, refreshing machine data...');
+      loadMachineData();
+    };
+
+    const handleVisibilityChange = () => {
+      // Refresh when tab becomes visible
+      if (!document.hidden) {
+        console.log('🔄 VISIBILITY REFRESH: Tab became visible, refreshing machine data...');
+        loadMachineData();
+      }
+    };
+
     // Listen for storage events (for cross-tab/cross-session changes)
     window.addEventListener('storage', handleStorageChange);
+
+    // Listen for window focus (when returning from machine management)
+    window.addEventListener('focus', handleWindowFocus);
+
+    // Listen for visibility changes
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     // Also poll for changes periodically (as storage events don't fire within same tab)
     const intervalId = setInterval(() => {
       loadMachineData();
-    }, 5000); // Refresh every 5 seconds
+    }, 3000); // Refresh every 3 seconds for better responsiveness
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('focus', handleWindowFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       clearInterval(intervalId);
     };
   }, [loadMachineData]);
@@ -925,10 +947,11 @@ export default function OfficeOverview() {
               </CardHeader>
 
               <CardContent className="space-y-4">
-                {machine.status === "offline" && (
+                {(machine.status === "offline" || machine.powerStatus === "offline" || machine.electricityStatus === "unavailable") && (
                   <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
                     <p className="text-sm text-red-800 font-medium flex items-center gap-2">
                       ⚠️ Machine is not operational
+                      {machine.electricityStatus === "unavailable" && " (No electricity)"}
                     </p>
                   </div>
                 )}
