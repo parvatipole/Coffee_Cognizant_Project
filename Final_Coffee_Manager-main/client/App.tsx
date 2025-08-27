@@ -21,6 +21,11 @@ import FloatingNavigation, {
 } from "./components/FloatingNavigation";
 import ErrorBoundary from "./components/ErrorBoundary";
 
+// Load development utilities in dev mode
+if (import.meta.env.DEV) {
+  import("./lib/devUtils");
+}
+
 const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
