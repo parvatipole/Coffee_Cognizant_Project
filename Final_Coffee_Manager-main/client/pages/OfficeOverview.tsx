@@ -638,8 +638,8 @@ export default function OfficeOverview() {
     );
   };
 
-  // Initialize machines on load
-  React.useEffect(() => {
+  // Function to load and merge machine data
+  const loadMachineData = React.useCallback(() => {
     const loadedMachines = getOfficeMachines();
     // Also load any machines from shared storage for this office (to see technician changes)
     const storedMachines = dataManager.getAllMachinesFromSharedStorage().filter(m => m.office === officeName);
@@ -662,6 +662,35 @@ export default function OfficeOverview() {
 
     setMachines(allMachines);
   }, [officeName]);
+
+  // Initialize machines on load
+  React.useEffect(() => {
+    loadMachineData();
+  }, [loadMachineData]);
+
+  // Listen for storage changes to detect real-time updates from technicians
+  React.useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      // Check if shared machines storage changed
+      if (e.key === 'coffee_shared_machines' && e.newValue !== e.oldValue) {
+        console.log('🔄 REAL-TIME SYNC: Detected shared storage change, refreshing machine data...');
+        loadMachineData();
+      }
+    };
+
+    // Listen for storage events (for cross-tab/cross-session changes)
+    window.addEventListener('storage', handleStorageChange);
+
+    // Also poll for changes periodically (as storage events don't fire within same tab)
+    const intervalId = setInterval(() => {
+      loadMachineData();
+    }, 5000); // Refresh every 5 seconds
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(intervalId);
+    };
+  }, [loadMachineData]);
 
   const canEdit = user?.role === "technician";
   const canAddMachines = user?.role === "admin";
@@ -725,6 +754,7 @@ export default function OfficeOverview() {
         status: machineData.status,
         office: officeName, // Auto-set from current office context
         powerStatus: "online" as const,
+        electricityStatus: "available" as const, // Add default electricity status
         lastPowerUpdate: new Date().toISOString().slice(0, 19).replace('T', ' '),
         lastMaintenance: new Date().toISOString().slice(0, 10),
         nextMaintenance: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
@@ -732,6 +762,7 @@ export default function OfficeOverview() {
           water: machineData.supplies.water,
           milk: machineData.supplies.milk,
           coffeeBeans: machineData.supplies.coffeeBeans,
+          coffee: machineData.supplies.coffeeBeans, // Backend compatibility
           sugar: machineData.supplies.sugar,
         },
         maintenance: machineData.maintenance,
@@ -740,6 +771,8 @@ export default function OfficeOverview() {
           weeklyCups: 0,
         },
         notes: machineData.notes || "New machine installation",
+        alerts: [],
+        recentRefills: [],
       };
 
       // Save to localStorage immediately
@@ -755,8 +788,8 @@ export default function OfficeOverview() {
         // Still continue with local save for offline functionality
       }
 
-      // Update local machines list
-      setMachines(prev => [...prev, newMachine]);
+      // Refresh machine data to show new machine immediately
+      loadMachineData();
       setIsAddMachineModalOpen(false);
 
       console.log('Machine added successfully:', newMachine);
