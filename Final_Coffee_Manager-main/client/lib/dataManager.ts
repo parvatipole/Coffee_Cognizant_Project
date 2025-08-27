@@ -62,7 +62,7 @@ const normalizeMachine = (machine: any) => {
 };
 
 export const dataManager = {
-  // Save machine data to localStorage
+  // Save machine data to localStorage and shared storage for cross-user visibility
   saveMachine: (machine: MachineData): void => {
     const existingMachines = dataManager.getAllMachines();
     // Filter out any existing machine that matches either id or machineId to prevent duplicates
@@ -76,9 +76,14 @@ export const dataManager = {
     const normalized = normalizeMachine(machine);
     updatedMachines.push(normalized);
 
-    console.log(`💾 DataManager: Saving machine ${machine.id}${machine.machineId ? ` (${machine.machineId})` : ''} to localStorage`);
+    console.log(`💾 DataManager: Saving machine ${machine.id}${machine.machineId ? ` (${machine.machineId})` : ''} to localStorage and shared storage`);
+
+    // Save to local storage (for user-specific data)
     localStorage.setItem(STORAGE_KEYS.MACHINES, JSON.stringify(updatedMachines));
     localStorage.setItem(STORAGE_KEYS.LAST_SYNC, new Date().toISOString());
+
+    // Also save to shared storage for cross-user visibility (simulates backend database)
+    dataManager.syncToSharedStorage(normalized);
   },
 
   // Get all machines from localStorage
