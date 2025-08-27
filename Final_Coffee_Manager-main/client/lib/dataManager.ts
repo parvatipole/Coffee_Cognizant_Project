@@ -1,6 +1,8 @@
 // Data persistence management for coffee machines
 // Handles localStorage persistence and data synchronization
 
+import { STORAGE_KEYS, SUPPLY_TYPES } from "@/config";
+
 interface MachineData {
   id: string;
   machineId?: string;
@@ -35,21 +37,17 @@ interface MachineData {
   recentRefills?: any[];
 }
 
-const STORAGE_KEYS = {
-  MACHINES: 'coffee_machines',
-  SHARED_MACHINES: 'coffee_shared_machines', // Shared storage for cross-user visibility
-  LAST_SYNC: 'coffee_last_sync',
-} as const;
+// Note: STORAGE_KEYS now imported from configuration
 
 // Normalize supplies to ensure both coffeeBeans (UI) and coffee (backend) are in sync
 const normalizeSupplies = (supplies: any) => {
   const coffeeBeans = supplies?.coffeeBeans ?? supplies?.coffee ?? 0;
   return {
-    water: supplies?.water ?? 0,
-    milk: supplies?.milk ?? 0,
-    sugar: supplies?.sugar ?? 0,
-    coffeeBeans: coffeeBeans,
-    coffee: coffeeBeans,
+    [SUPPLY_TYPES.WATER]: supplies?.[SUPPLY_TYPES.WATER] ?? 0,
+    [SUPPLY_TYPES.MILK]: supplies?.[SUPPLY_TYPES.MILK] ?? 0,
+    [SUPPLY_TYPES.SUGAR]: supplies?.[SUPPLY_TYPES.SUGAR] ?? 0,
+    [SUPPLY_TYPES.COFFEE_BEANS]: coffeeBeans,
+    [SUPPLY_TYPES.COFFEE]: coffeeBeans,
   } as any;
 };
 
@@ -188,10 +186,10 @@ export const dataManager = {
     return {
       ...frontendData,
       supplies: {
-        water: supplies.water,
-        milk: supplies.milk,
-        sugar: supplies.sugar,
-        coffee: supplies.coffee, // backend expects `coffee`
+        [SUPPLY_TYPES.WATER]: supplies[SUPPLY_TYPES.WATER],
+        [SUPPLY_TYPES.MILK]: supplies[SUPPLY_TYPES.MILK],
+        [SUPPLY_TYPES.SUGAR]: supplies[SUPPLY_TYPES.SUGAR],
+        [SUPPLY_TYPES.COFFEE]: supplies[SUPPLY_TYPES.COFFEE], // backend expects `coffee`
       },
       // Ensure new fields are included
       electricityStatus: frontendData.electricityStatus || 'available',
