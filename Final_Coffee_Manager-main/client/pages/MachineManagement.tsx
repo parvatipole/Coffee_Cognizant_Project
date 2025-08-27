@@ -867,6 +867,110 @@ export default function MachineManagement({
             </CardHeader>
           </Card>
 
+          {/* Machine Status & Electricity Management */}
+          <Card className="animate-fadeIn" style={{ animationDelay: "100ms" }}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="w-5 h-5" />
+                Machine Status & Power Management
+              </CardTitle>
+              <CardDescription>
+                Current operational status and electricity management
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Machine Status */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Machine Status</Label>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3 h-3 rounded-full ${getStatusColor(machineData.status)}`} />
+                    <span className="capitalize text-sm font-medium">
+                      {machineData.status === "offline" && machineData.electricityStatus === "unavailable"
+                        ? "Not Operational (No Electricity)"
+                        : machineData.status}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Electricity Status */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Electricity Status</Label>
+                  <div className="flex items-center gap-2">
+                    {machineData.electricityStatus === "available" ? (
+                      <Zap className="w-4 h-4 text-green-600" />
+                    ) : (
+                      <ZapOff className="w-4 h-4 text-red-600" />
+                    )}
+                    <span className={`text-sm font-medium ${
+                      machineData.electricityStatus === "available" ? "text-green-600" : "text-red-600"
+                    }`}>
+                      {machineData.electricityStatus === "available" ? "Available" : "Unavailable"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Technician Controls */}
+                {canEdit && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Technician Controls</Label>
+                    <div className="flex gap-2">
+                      {!isEditingElectricity ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setIsEditingElectricity(true)}
+                          className="text-xs"
+                        >
+                          <Edit3 className="w-3 h-3 mr-1" />
+                          Edit Status
+                        </Button>
+                      ) : (
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant={machineData.electricityStatus === "available" ? "destructive" : "default"}
+                            onClick={() => handleElectricityStatusChange(
+                              machineData.electricityStatus === "available" ? "unavailable" : "available"
+                            )}
+                            className="text-xs"
+                          >
+                            {machineData.electricityStatus === "available" ? (
+                              <>
+                                <ZapOff className="w-3 h-3 mr-1" />
+                                Set Offline
+                              </>
+                            ) : (
+                              <>
+                                <Zap className="w-3 h-3 mr-1" />
+                                Set Online
+                              </>
+                            )}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setIsEditingElectricity(false)}
+                            className="text-xs"
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Last Update Info */}
+              <div className="mt-4 pt-4 border-t">
+                <div className="text-xs text-muted-foreground">
+                  Last power update: {machineData.lastPowerUpdate || "Unknown"}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Main Dashboard Tabs */}
           <Tabs defaultValue="overview" className="space-y-6">
             <TabsList className="grid w-full grid-cols-3">
