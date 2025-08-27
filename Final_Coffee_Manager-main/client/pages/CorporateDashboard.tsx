@@ -1380,6 +1380,18 @@ export default function CorporateDashboard() {
         selectedOffice={selectedOffice}
         isLoading={isAddingMachine}
       />
+
+      {/* Delete Machine Dialog */}
+      <DeleteMachineDialog
+        isOpen={isDeleteMachineDialogOpen}
+        onClose={() => {
+          setIsDeleteMachineDialogOpen(false);
+          setMachineToDelete(null);
+        }}
+        onConfirm={handleConfirmDeleteMachine}
+        machine={machineToDelete}
+        isLoading={isDeletingMachine}
+      />
     </div>
   );
 }
