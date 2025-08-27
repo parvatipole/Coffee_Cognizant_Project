@@ -643,6 +643,7 @@ export default function OfficeOverview() {
     const loadedMachines = getOfficeMachines();
     // Also load any machines from shared storage for this office (to see technician changes)
     const storedMachines = dataManager.getAllMachinesFromSharedStorage().filter(m => m.office === officeName);
+    console.log(`✅ OFFICE VIEW: Loading ${storedMachines.length} machines from shared storage for ${officeName}`);
     const allMachines = [...loadedMachines];
 
     // Add stored machines that don't already exist

@@ -524,7 +524,7 @@ export default function CorporateDashboard() {
       const storedMachines = dataManager.getAllMachinesFromSharedStorage();
 
       if (storedMachines.length > 0) {
-        console.log(`Loaded ${storedMachines.length} machines from localStorage`);
+        console.log(`✅ ADMIN VIEW: Loaded ${storedMachines.length} machines from shared storage (cross-user sync enabled)`);
 
         // Group stored machines by office
         const machinesByOffice = storedMachines.reduce((acc, machine) => {
