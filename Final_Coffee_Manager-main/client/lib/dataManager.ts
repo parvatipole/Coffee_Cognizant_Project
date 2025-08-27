@@ -2,6 +2,7 @@
 // Handles localStorage persistence and data synchronization
 
 import { STORAGE_KEYS, SUPPLY_TYPES } from "@/config";
+import { generateDemoMachines } from "@/config/machines";
 
 interface MachineData {
   id: string;
@@ -317,7 +318,6 @@ export const dataManager = {
       if (!stored) {
         // Initialize with demo data if shared storage is empty
         console.log('🚀 INITIALIZING: Setting up shared storage with demo machines for cross-user sync');
-        const { generateDemoMachines } = require('@/config/machines');
         const demoMachines = generateDemoMachines();
 
         // Ensure each machine has all required fields for consistency
@@ -337,9 +337,20 @@ export const dataManager = {
 
       const sharedMachines = JSON.parse(stored);
       if (!Array.isArray(sharedMachines)) {
-        console.warn('⚠️ SHARED STORAGE: Invalid data format, reinitializing...');
+        console.warn('⚠️ SHARED STORAGE: Invalid data format, creating default data...');
         localStorage.removeItem(STORAGE_KEYS.SHARED_MACHINES);
-        return dataManager.getAllMachinesFromSharedStorage(); // Recursive call to reinitialize
+        // Return default demo machines instead of recursive call
+        const demoMachines = generateDemoMachines();
+        const normalizedDemoMachines = demoMachines.map(machine => ({
+          ...machine,
+          electricityStatus: machine.electricityStatus || "available",
+          alerts: machine.alerts || [],
+          recentRefills: machine.recentRefills || [],
+          lastUpdated: new Date().toISOString(),
+          updatedBy: 'system'
+        }));
+        localStorage.setItem(STORAGE_KEYS.SHARED_MACHINES, JSON.stringify(normalizedDemoMachines));
+        return normalizedDemoMachines.map(normalizeMachine);
       }
 
       const machines = sharedMachines.map(normalizeMachine);
@@ -353,9 +364,25 @@ export const dataManager = {
       return machines;
     } catch (error) {
       console.error('Failed to get machines from shared storage:', error);
-      // Clear corrupted data and reinitialize
+      // Clear corrupted data and return default machines instead of recursive call
       localStorage.removeItem(STORAGE_KEYS.SHARED_MACHINES);
-      return dataManager.getAllMachinesFromSharedStorage(); // Recursive call to reinitialize
+      try {
+        const demoMachines = generateDemoMachines();
+        const normalizedDemoMachines = demoMachines.map(machine => ({
+          ...machine,
+          electricityStatus: machine.electricityStatus || "available",
+          alerts: machine.alerts || [],
+          recentRefills: machine.recentRefills || [],
+          lastUpdated: new Date().toISOString(),
+          updatedBy: 'system'
+        }));
+        localStorage.setItem(STORAGE_KEYS.SHARED_MACHINES, JSON.stringify(normalizedDemoMachines));
+        console.log('🔄 RECOVERY: Created fallback demo machines after error');
+        return normalizedDemoMachines.map(normalizeMachine);
+      } catch (fallbackError) {
+        console.error('Failed to create fallback data:', fallbackError);
+        return []; // Return empty array as last resort
+      }
     }
   },
 
