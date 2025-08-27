@@ -377,4 +377,68 @@ export const dataManager = {
     console.log('Shared:', sharedMachines.map(m => `${m.id}:${m.status}`));
     console.log('============================');
   },
+
+  // Initialize data manager and ensure persistence across sessions
+  initialize: (): void => {
+    console.log('🚀 DataManager: Initializing data persistence system...');
+
+    // Ensure shared storage is initialized
+    dataManager.getAllMachinesFromSharedStorage();
+
+    // Set up global event listeners for cross-tab synchronization
+    if (typeof window !== 'undefined') {
+      // Listen for storage events from other tabs
+      window.addEventListener('storage', (e) => {
+        if (e.key === STORAGE_KEYS.SHARED_MACHINES && e.newValue !== e.oldValue) {
+          console.log('🔄 DataManager: Detected cross-tab storage change');
+          window.dispatchEvent(new CustomEvent('machineDataChanged', {
+            detail: { source: 'cross-tab', action: 'storage-update' }
+          }));
+        }
+      });
+
+      // Periodic sync to ensure data consistency (every 10 seconds)
+      setInterval(() => {
+        // Silent check - no logging unless there are issues
+        try {
+          const sharedCount = dataManager.getAllMachinesFromSharedStorage().length;
+          if (sharedCount === 0) {
+            console.warn('⚠️ DataManager: Shared storage appears empty, reinitializing...');
+            dataManager.getAllMachinesFromSharedStorage(); // Will reinitialize
+          }
+        } catch (error) {
+          console.error('DataManager: Periodic sync error:', error);
+        }
+      }, 10000);
+
+      console.log('✅ DataManager: Initialization complete with cross-tab sync and periodic checks');
+    }
+  },
+
+  // Ensure data persistence for a specific user role and office
+  ensureUserDataPersistence: (userRole: string, officeName?: string): void => {
+    console.log(`👥 DataManager: Ensuring data persistence for ${userRole}${officeName ? ` in ${officeName}` : ''}`);
+
+    // Initialize shared storage if needed
+    const sharedMachines = dataManager.getAllMachinesFromSharedStorage();
+
+    if (userRole === 'technician' && officeName) {
+      // Technicians should see machines for their office
+      const officeMachines = sharedMachines.filter(m => m.office === officeName);
+      console.log(`✅ Technician ${officeName}: ${officeMachines.length} machines available`);
+
+      // If no machines for this office, ensure they exist
+      if (officeMachines.length === 0) {
+        console.log(`📦 No machines found for ${officeName}, this may be normal for new offices`);
+      }
+    } else if (userRole === 'admin') {
+      // Admins should see all machines
+      console.log(`✅ Admin: ${sharedMachines.length} total machines across all offices`);
+      const officeBreakdown = sharedMachines.reduce((acc, machine) => {
+        acc[machine.office] = (acc[machine.office] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      console.log('Office breakdown:', officeBreakdown);
+    }
+  },
 };
