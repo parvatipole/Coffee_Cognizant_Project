@@ -161,6 +161,10 @@ export const dataManager = {
         sugar: supplies.sugar,
         coffee: supplies.coffee, // backend expects `coffee`
       },
+      // Ensure new fields are included
+      electricityStatus: frontendData.electricityStatus || 'available',
+      recentRefills: frontendData.recentRefills || [],
+      alerts: frontendData.alerts || [],
     };
   },
 };
