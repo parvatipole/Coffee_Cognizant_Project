@@ -455,9 +455,11 @@ export default function MachineManagement({
             setMachineData(mappedData);
             dataManager.saveMachine(mappedData);
 
-            if (apiData.alerts) {
-              setAlerts(apiData.alerts);
-            }
+            // Generate dynamic alerts and merge with API alerts
+            const dynamicAlerts = generateDynamicAlerts(mappedData);
+            const apiAlerts = apiData.alerts || [];
+            const mergedAlerts = [...apiAlerts, ...dynamicAlerts];
+            setAlerts(mergedAlerts);
           }
         } catch (apiError) {
           console.log('API unavailable, using existing data:', apiError.message);
