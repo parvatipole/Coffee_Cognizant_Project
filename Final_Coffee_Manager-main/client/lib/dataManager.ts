@@ -98,8 +98,16 @@ export const dataManager = {
     }
   },
 
-  // Get machine by ID
+  // Get machine by ID (checks shared storage first for latest updates)
   getMachine: (id: string): MachineData | null => {
+    // First check shared storage for the most recent updates (from other users)
+    const sharedMachine = dataManager.getMachineFromSharedStorage(id);
+    if (sharedMachine) {
+      console.log(`🔍 DataManager: Found machine "${id}" in shared storage (latest updates)`);
+      return sharedMachine;
+    }
+
+    // Fallback to local storage if not found in shared storage
     const machines = dataManager.getAllMachines();
     const found = machines.find(m => m.id === id || m.machineId === id) || null;
     console.log(`🔍 DataManager: Looking for machine with id/machineId "${id}". Found: ${found ? `${found.id} (${found.machineId})` : 'null'}`);
