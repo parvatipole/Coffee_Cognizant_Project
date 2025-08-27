@@ -33,82 +33,139 @@ export const tokenManager = {
   },
 };
 
-// Standalone mode data - simulates backend responses for development
-const standaloneData = {
-  machines: [
-    {
-      id: "HIJ-001",
-      machineId: "HIJ-001",
-      name: "Coffee Station Alpha",
-      location: "Hinjewadi IT Park - Building A2",
-      office: "Hinjewadi IT Park",
-      floor: "Floor 3",
-      status: "operational",
-      powerStatus: "online",
-      electricityStatus: "available",
-      lastPowerUpdate: "2024-01-16 09:30",
-      lastMaintenance: "2024-01-10",
-      nextMaintenance: "2024-02-10",
-      supplies: { water: 85, milk: 60, coffee: 75, sugar: 90 },
-      maintenance: {
-        filterStatus: "good",
-        cleaningStatus: "clean",
-        pressure: 15,
-      },
-      usage: { dailyCups: 127, weeklyCups: 890 },
-      notes: "Machine running smoothly. Recent cleaning completed on schedule.",
-      alerts: [],
-      recentRefills: []
+// Shared data storage for standalone mode - ensures all users see the same data
+const SHARED_MACHINES_KEY = 'coffee_shared_machines';
+
+// Default machine data for first-time initialization
+const defaultMachineData = [
+  {
+    id: "HIJ-001",
+    machineId: "HIJ-001",
+    name: "Coffee Station Alpha",
+    location: "Hinjewadi IT Park - Building A2",
+    office: "Hinjewadi IT Park",
+    floor: "Floor 3",
+    status: "operational",
+    powerStatus: "online",
+    electricityStatus: "available",
+    lastPowerUpdate: "2024-01-16 09:30",
+    lastMaintenance: "2024-01-10",
+    nextMaintenance: "2024-02-10",
+    supplies: { water: 85, milk: 60, coffee: 75, sugar: 90 },
+    maintenance: {
+      filterStatus: "good",
+      cleaningStatus: "clean",
+      pressure: 15,
     },
-    {
-      id: "HIJ-002",
-      machineId: "HIJ-002",
-      name: "Espresso Hub Beta",
-      location: "Hinjewadi IT Park - Building B1",
-      office: "Hinjewadi IT Park",
-      floor: "Floor 2",
-      status: "operational",
-      powerStatus: "online",
-      electricityStatus: "available",
-      lastPowerUpdate: "2024-01-16 08:45",
-      lastMaintenance: "2024-01-12",
-      nextMaintenance: "2024-02-12",
-      supplies: { water: 92, milk: 45, coffee: 88, sugar: 76 },
-      maintenance: {
-        filterStatus: "good",
-        cleaningStatus: "clean",
-        pressure: 14,
-      },
-      usage: { dailyCups: 98, weeklyCups: 686 },
-      notes: "High performance. Minor calibration needed.",
-      alerts: [],
-      recentRefills: []
+    usage: { dailyCups: 127, weeklyCups: 890 },
+    notes: "Machine running smoothly. Recent cleaning completed on schedule.",
+    alerts: [],
+    recentRefills: []
+  },
+  {
+    id: "HIJ-002",
+    machineId: "HIJ-002",
+    name: "Espresso Hub Beta",
+    location: "Hinjewadi IT Park - Building B1",
+    office: "Hinjewadi IT Park",
+    floor: "Floor 2",
+    status: "operational",
+    powerStatus: "online",
+    electricityStatus: "available",
+    lastPowerUpdate: "2024-01-16 08:45",
+    lastMaintenance: "2024-01-12",
+    nextMaintenance: "2024-02-12",
+    supplies: { water: 92, milk: 45, coffee: 88, sugar: 76 },
+    maintenance: {
+      filterStatus: "good",
+      cleaningStatus: "clean",
+      pressure: 14,
     },
-    {
-      id: "KOR-001",
-      machineId: "KOR-001",
-      name: "Executive Espresso",
-      location: "Koregaon Park Office - Ground Floor",
-      office: "Koregaon Park Office",
-      floor: "Floor 1",
-      status: "operational",
-      powerStatus: "online",
-      electricityStatus: "available",
-      lastPowerUpdate: "2024-01-16 10:15",
-      lastMaintenance: "2024-01-05",
-      nextMaintenance: "2024-02-05",
-      supplies: { water: 78, milk: 80, coffee: 65, sugar: 95 },
-      maintenance: {
-        filterStatus: "good",
-        cleaningStatus: "clean",
-        pressure: 12,
-      },
-      usage: { dailyCups: 89, weeklyCups: 650 },
-      notes: "Popular machine. Consistent performance.",
-      alerts: [],
-      recentRefills: []
+    usage: { dailyCups: 98, weeklyCups: 686 },
+    notes: "High performance. Minor calibration needed.",
+    alerts: [],
+    recentRefills: []
+  },
+  {
+    id: "KOR-001",
+    machineId: "KOR-001",
+    name: "Executive Espresso",
+    location: "Koregaon Park Office - Ground Floor",
+    office: "Koregaon Park Office",
+    floor: "Floor 1",
+    status: "operational",
+    powerStatus: "online",
+    electricityStatus: "available",
+    lastPowerUpdate: "2024-01-16 10:15",
+    lastMaintenance: "2024-01-05",
+    nextMaintenance: "2024-02-05",
+    supplies: { water: 78, milk: 80, coffee: 65, sugar: 95 },
+    maintenance: {
+      filterStatus: "good",
+      cleaningStatus: "clean",
+      pressure: 12,
+    },
+    usage: { dailyCups: 89, weeklyCups: 650 },
+    notes: "Popular machine. Consistent performance.",
+    alerts: [],
+    recentRefills: []
+  }
+];
+
+// Shared data manager for standalone mode
+const sharedDataManager = {
+  // Get all machines from shared storage (simulates backend database)
+  getMachines: () => {
+    try {
+      const stored = localStorage.getItem(SHARED_MACHINES_KEY);
+      if (!stored) {
+        // Initialize with default data if not exists
+        console.log('🔧 Initializing shared machine data for standalone mode');
+        localStorage.setItem(SHARED_MACHINES_KEY, JSON.stringify(defaultMachineData));
+        return defaultMachineData;
+      }
+      return JSON.parse(stored);
+    } catch (error) {
+      console.warn('Failed to load shared machines data:', error);
+      return defaultMachineData;
     }
-  ]
+  },
+
+  // Save all machines to shared storage
+  saveMachines: (machines: any[]) => {
+    try {
+      localStorage.setItem(SHARED_MACHINES_KEY, JSON.stringify(machines));
+      console.log('💾 Shared data: Saved machines to shared storage');
+    } catch (error) {
+      console.error('Failed to save machines to shared storage:', error);
+    }
+  },
+
+  // Update a specific machine in shared storage
+  updateMachine: (id: string, updateData: any) => {
+    const machines = sharedDataManager.getMachines();
+    const machineIndex = machines.findIndex((m: any) => m.id === id || m.machineId === id);
+    if (machineIndex !== -1) {
+      machines[machineIndex] = { ...machines[machineIndex], ...updateData };
+      sharedDataManager.saveMachines(machines);
+      console.log(`💾 Shared data: Updated machine ${id} in shared storage`);
+      return machines[machineIndex];
+    }
+    throw new Error('Machine not found in shared storage');
+  },
+
+  // Update machine supplies in shared storage
+  updateMachineSupplies: (id: string, supplies: any) => {
+    const machines = sharedDataManager.getMachines();
+    const machineIndex = machines.findIndex((m: any) => m.id === id || m.machineId === id);
+    if (machineIndex !== -1) {
+      machines[machineIndex].supplies = { ...machines[machineIndex].supplies, ...supplies };
+      sharedDataManager.saveMachines(machines);
+      console.log(`💾 Shared data: Updated supplies for machine ${id} in shared storage`);
+      return machines[machineIndex];
+    }
+    throw new Error('Machine not found in shared storage');
+  }
 };
 
 // API Client with standalone mode support
