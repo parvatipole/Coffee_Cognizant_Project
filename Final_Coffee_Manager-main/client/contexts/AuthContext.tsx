@@ -67,12 +67,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     if (storedUser && token && !tokenManager.isTokenExpired(token)) {
       setUser(JSON.parse(storedUser));
 
-      // Ensure shared storage is initialized for cross-user data visibility
+      // Ensure shared storage and user-specific data persistence
       try {
+        const userData = JSON.parse(storedUser);
         dataManager.getAllMachinesFromSharedStorage(); // This initializes shared storage if empty
-        console.log('✅ AUTH: Shared storage initialized on login');
+        dataManager.ensureUserDataPersistence(userData.role, userData.officeName);
+        console.log('✅ AUTH: Data persistence restored for returning user');
       } catch (error) {
-        console.warn('Failed to initialize shared storage on login:', error);
+        console.warn('Failed to initialize data persistence on auth restoration:', error);
       }
 
       // Initialize MQTT connection for authenticated users
@@ -120,12 +122,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         // Simple token for demo
         localStorage.setItem("coffee_auth_token", "simple_token_" + Date.now());
 
-        // Ensure shared storage is initialized for cross-user data visibility
+        // Ensure shared storage and user-specific data persistence
         try {
           dataManager.getAllMachinesFromSharedStorage(); // This initializes shared storage if empty
-          console.log('✅ LOGIN: Shared storage initialized for cross-user sync');
+          dataManager.ensureUserDataPersistence(userData.role, userData.officeName);
+          console.log('✅ LOGIN: Data persistence established for user');
         } catch (error) {
-          console.warn('Failed to initialize shared storage on login:', error);
+          console.warn('Failed to initialize data persistence on login:', error);
         }
 
         // Initialize MQTT connection
@@ -178,12 +181,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setUser(userData);
       localStorage.setItem("coffee_auth_user", JSON.stringify(userData));
 
-      // Ensure shared storage is initialized for cross-user data visibility
+      // Ensure shared storage and user-specific data persistence
       try {
         dataManager.getAllMachinesFromSharedStorage(); // This initializes shared storage if empty
-        console.log('✅ DEMO LOGIN: Shared storage initialized for cross-user sync');
+        dataManager.ensureUserDataPersistence(userData.role, userData.officeName);
+        console.log('✅ DEMO LOGIN: Data persistence established for demo user');
       } catch (error) {
-        console.warn('Failed to initialize shared storage on demo login:', error);
+        console.warn('Failed to initialize data persistence on demo login:', error);
       }
 
       // Initialize MQTT in demo mode
