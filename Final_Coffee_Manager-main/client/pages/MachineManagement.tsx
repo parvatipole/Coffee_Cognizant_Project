@@ -87,10 +87,10 @@ export default function MachineManagement({
 }: MachineManagementProps = {}) {
   const { user } = useAuth();
   const { machineId } = useParams<{ machineId?: string }>();
-  const [isEditing, setIsEditing] = useState(false);
   const [refillModalOpen, setRefillModalOpen] = useState(false);
   const [selectedSupply, setSelectedSupply] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isEditingElectricity, setIsEditingElectricity] = useState(false);
 
   // Get machine data by ID (searches localStorage first, then static data)
   const getMachineDataById = (id: string): MachineData | null => {
