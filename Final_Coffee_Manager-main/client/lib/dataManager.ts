@@ -254,7 +254,14 @@ export const dataManager = {
   getAllMachinesFromSharedStorage: (): MachineData[] => {
     try {
       const stored = localStorage.getItem(STORAGE_KEYS.SHARED_MACHINES);
-      if (!stored) return [];
+      if (!stored) {
+        // Initialize with demo data if shared storage is empty
+        console.log('📦 Initializing shared storage with demo machines');
+        const { generateDemoMachines } = require('@/config/machines');
+        const demoMachines = generateDemoMachines();
+        localStorage.setItem(STORAGE_KEYS.SHARED_MACHINES, JSON.stringify(demoMachines));
+        return demoMachines.map(normalizeMachine);
+      }
 
       const sharedMachines = JSON.parse(stored);
       return Array.isArray(sharedMachines) ? sharedMachines.map(normalizeMachine) : [];
