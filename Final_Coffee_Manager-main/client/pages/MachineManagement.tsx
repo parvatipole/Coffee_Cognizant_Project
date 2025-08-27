@@ -486,10 +486,12 @@ export default function MachineManagement({
 
   // Update alerts when machine data changes
   useEffect(() => {
+    if (!machineData) return;
+
     const dynamicAlerts = generateDynamicAlerts(machineData);
     const existingResolvedAlerts = alerts.filter(alert => alert.resolved);
     setAlerts([...existingResolvedAlerts, ...dynamicAlerts]);
-  }, [machineData.supplies, machineData.electricityStatus, machineData.maintenance]);
+  }, [machineData?.supplies, machineData?.electricityStatus, machineData?.maintenance]);
 
   // Handle alert resolution
   const handleAlertResolution = async (alertId: string) => {
@@ -782,6 +784,19 @@ export default function MachineManagement({
     }, 100);
     return () => clearTimeout(timer);
   }, []);
+
+  // Show loading state while machine data is being loaded
+  if (isLoadingMachine || !machineData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-coffee-light/30 to-background flex items-center justify-center">
+        <div className="text-center">
+          <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-lg font-medium">Loading machine data...</p>
+          <p className="text-sm text-muted-foreground">Please wait while we fetch the latest information</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-coffee-light/30 to-background">
