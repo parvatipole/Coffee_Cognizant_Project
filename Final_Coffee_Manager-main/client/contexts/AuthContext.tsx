@@ -65,6 +65,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     if (storedUser && token && !tokenManager.isTokenExpired(token)) {
       setUser(JSON.parse(storedUser));
+
+      // Ensure shared storage is initialized for cross-user data visibility
+      try {
+        const { dataManager } = await import('@/lib/dataManager');
+        dataManager.getAllMachinesFromSharedStorage(); // This initializes shared storage if empty
+        console.log('✅ AUTH: Shared storage initialized on login');
+      } catch (error) {
+        console.warn('Failed to initialize shared storage on login:', error);
+      }
+
       // Initialize MQTT connection for authenticated users
       initializeMQTT().then((connected) => {
         if (connected) {
@@ -109,6 +119,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         // Simple token for demo
         localStorage.setItem("coffee_auth_token", "simple_token_" + Date.now());
+
+        // Ensure shared storage is initialized for cross-user data visibility
+        try {
+          const { dataManager } = await import('@/lib/dataManager');
+          dataManager.getAllMachinesFromSharedStorage(); // This initializes shared storage if empty
+          console.log('✅ LOGIN: Shared storage initialized for cross-user sync');
+        } catch (error) {
+          console.warn('Failed to initialize shared storage on login:', error);
+        }
 
         // Initialize MQTT connection
         await initializeMQTT();
@@ -159,6 +178,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       setUser(userData);
       localStorage.setItem("coffee_auth_user", JSON.stringify(userData));
+
+      // Ensure shared storage is initialized for cross-user data visibility
+      try {
+        const { dataManager } = await import('@/lib/dataManager');
+        dataManager.getAllMachinesFromSharedStorage(); // This initializes shared storage if empty
+        console.log('✅ DEMO LOGIN: Shared storage initialized for cross-user sync');
+      } catch (error) {
+        console.warn('Failed to initialize shared storage on demo login:', error);
+      }
 
       // Initialize MQTT in demo mode
       await initializeMQTT();
