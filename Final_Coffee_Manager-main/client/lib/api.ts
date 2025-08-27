@@ -247,40 +247,43 @@ class ApiClient {
     await new Promise(resolve => setTimeout(resolve, Math.random() * 500 + 100));
 
     const method = options.method || 'GET';
-    
-    // Handle different endpoints in standalone mode
+
+    // Handle different endpoints in standalone mode using shared data storage
     switch (true) {
       case endpoint === '/machines' && method === 'GET':
-        return standaloneData.machines as T;
+        const allMachines = sharedDataManager.getMachines();
+        console.log('🔄 Shared data: Retrieved all machines from shared storage');
+        return allMachines as T;
 
       case endpoint.startsWith('/machines/machine/') && method === 'GET':
         const machineId = endpoint.split('/').pop();
-        const machine = standaloneData.machines.find(m => m.id === machineId || m.machineId === machineId);
+        const machines = sharedDataManager.getMachines();
+        const machine = machines.find((m: any) => m.id === machineId || m.machineId === machineId);
         if (!machine) throw new Error('Machine not found');
+        console.log(`🔄 Shared data: Retrieved machine ${machineId} from shared storage`);
         return machine as T;
 
       case endpoint.startsWith('/machines/') && method === 'PUT':
         const updateId = endpoint.split('/')[2];
         const updateData = JSON.parse(options.body as string);
-        const machineIndex = standaloneData.machines.findIndex(m => m.id === updateId || m.machineId === updateId);
-        if (machineIndex !== -1) {
-          standaloneData.machines[machineIndex] = { ...standaloneData.machines[machineIndex], ...updateData };
-          return standaloneData.machines[machineIndex] as T;
+        try {
+          const updatedMachine = sharedDataManager.updateMachine(updateId, updateData);
+          console.log(`✅ Shared data: Machine ${updateId} updated in shared storage`);
+          return updatedMachine as T;
+        } catch (error) {
+          throw new Error('Machine not found');
         }
-        throw new Error('Machine not found');
 
       case endpoint.includes('/supplies') && method === 'PUT':
         const supplyId = endpoint.split('/')[2];
         const supplyData = JSON.parse(options.body as string);
-        const supplyMachineIndex = standaloneData.machines.findIndex(m => m.id === supplyId || m.machineId === supplyId);
-        if (supplyMachineIndex !== -1) {
-          standaloneData.machines[supplyMachineIndex].supplies = { 
-            ...standaloneData.machines[supplyMachineIndex].supplies, 
-            ...supplyData.supplies 
-          };
+        try {
+          sharedDataManager.updateMachineSupplies(supplyId, supplyData.supplies);
+          console.log(`✅ Shared data: Supplies updated for machine ${supplyId} in shared storage`);
           return { message: "Supplies updated successfully" } as T;
+        } catch (error) {
+          throw new Error('Machine not found');
         }
-        throw new Error('Machine not found');
 
       case endpoint === '/auth/signin' && method === 'POST':
         const { username, password } = JSON.parse(options.body as string);
