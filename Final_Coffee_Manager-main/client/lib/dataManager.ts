@@ -59,6 +59,20 @@ const normalizeMachine = (machine: any) => {
   };
 };
 
+// Add global debug function
+if (typeof window !== 'undefined') {
+  (window as any).debugCoffeeMachines = () => {
+    const dm = dataManager;
+    dm.debugStorageState();
+    return {
+      local: dm.getAllMachines(),
+      shared: dm.getAllMachinesFromSharedStorage(),
+      refresh: dm.refreshSharedStorage
+    };
+  };
+  console.log('🔧 DEBUG: Use window.debugCoffeeMachines() to debug storage state');
+}
+
 export const dataManager = {
   // Save machine data to localStorage and shared storage for cross-user visibility
   saveMachine: (machine: MachineData): void => {
@@ -218,18 +232,34 @@ export const dataManager = {
       }
 
       // Filter out existing machine by both id and machineId
+      const beforeCount = sharedMachines.length;
       sharedMachines = sharedMachines.filter((m: any) => {
         const matchesId = m.id === machine.id;
         const matchesMachineId = machine.machineId && m.machineId === machine.machineId;
         return !matchesId && !matchesMachineId;
       });
+      const afterCount = sharedMachines.length;
 
-      // Add the updated machine
-      sharedMachines.push(machine);
+      // Add the updated machine with timestamp
+      const machineWithTimestamp = {
+        ...machine,
+        lastUpdated: new Date().toISOString(),
+        updatedBy: 'technician', // Track who made the change
+      };
+      sharedMachines.push(machineWithTimestamp);
 
       // Save back to shared storage
       localStorage.setItem(STORAGE_KEYS.SHARED_MACHINES, JSON.stringify(sharedMachines));
-      console.log(`🔄 TECHNICIAN UPDATE: Synced machine ${machine.id} to shared storage - Admin will see this change!`);
+
+      // Enhanced logging
+      const action = beforeCount === afterCount ? 'ADDED' : 'UPDATED';
+      console.log(`🔄 TECHNICIAN UPDATE: ${action} machine ${machine.id} (status: ${machine.status}) to shared storage - Admin will see this change!`);
+      console.log(`📊 Storage stats: ${beforeCount} -> ${sharedMachines.length} machines in shared storage`);
+
+      // Dispatch a custom event to notify other components
+      window.dispatchEvent(new CustomEvent('machineDataChanged', {
+        detail: { machine: machineWithTimestamp, action }
+      }));
     } catch (error) {
       console.warn('Failed to sync machine to shared storage:', error);
     }
@@ -266,10 +296,37 @@ export const dataManager = {
       }
 
       const sharedMachines = JSON.parse(stored);
-      return Array.isArray(sharedMachines) ? sharedMachines.map(normalizeMachine) : [];
+      const machines = Array.isArray(sharedMachines) ? sharedMachines.map(normalizeMachine) : [];
+
+      // Enhanced logging for debugging
+      console.log(`📊 SHARED STORAGE: Loaded ${machines.length} machines from shared storage`);
+      machines.forEach(m => {
+        console.log(`  - ${m.id}: ${m.status} (power: ${m.powerStatus}, electricity: ${m.electricityStatus})`);
+      });
+
+      return machines;
     } catch (error) {
       console.warn('Failed to get machines from shared storage:', error);
       return [];
     }
+  },
+
+  // Force refresh shared storage data (useful for debugging)
+  refreshSharedStorage: (): void => {
+    console.log('🔄 FORCE REFRESH: Manually refreshing shared storage...');
+    // Trigger a storage event to notify all listening components
+    window.dispatchEvent(new CustomEvent('forceRefreshMachines'));
+  },
+
+  // Debug helper to see current state
+  debugStorageState: (): void => {
+    console.log('=== STORAGE DEBUG STATE ===');
+    const localMachines = dataManager.getAllMachines();
+    const sharedMachines = dataManager.getAllMachinesFromSharedStorage();
+    console.log(`Local machines: ${localMachines.length}`);
+    console.log(`Shared machines: ${sharedMachines.length}`);
+    console.log('Local:', localMachines.map(m => `${m.id}:${m.status}`));
+    console.log('Shared:', sharedMachines.map(m => `${m.id}:${m.status}`));
+    console.log('============================');
   },
 };
