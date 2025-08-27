@@ -646,10 +646,17 @@ export default function OfficeOverview() {
     console.log(`✅ OFFICE VIEW: Loading ${storedMachines.length} machines from shared storage for ${officeName}`);
     const allMachines = [...loadedMachines];
 
-    // Add stored machines that don't already exist
+    // REPLACE existing machines with updated versions, add new ones
     storedMachines.forEach(stored => {
-      if (!allMachines.find(m => m.id === stored.id)) {
+      const existingIndex = allMachines.findIndex(m => m.id === stored.id);
+      if (existingIndex !== -1) {
+        // REPLACE existing machine with updated version
+        allMachines[existingIndex] = stored;
+        console.log(`🔄 OFFICE: Updated machine ${stored.id} status to ${stored.status}`);
+      } else {
+        // ADD new machine if it doesn't exist
         allMachines.push(stored);
+        console.log(`➕ OFFICE: Added new machine ${stored.id}`);
       }
     });
 
