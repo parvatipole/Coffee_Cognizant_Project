@@ -67,7 +67,7 @@ interface MachineData {
 
 export default function OfficeOverview() {
   const { officePath } = useParams<{ officePath: string }>();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   // Add Machine Modal state
   const [isAddMachineModalOpen, setIsAddMachineModalOpen] = useState(false);
