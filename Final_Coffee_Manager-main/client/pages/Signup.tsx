@@ -26,6 +26,7 @@ import {
   Eye,
   EyeOff,
   MapPin,
+  Mail,
 } from "lucide-react";
 
 export default function Signup() {
@@ -33,6 +34,7 @@ export default function Signup() {
   const [formData, setFormData] = useState({
     username: "",
     name: "",
+    gmail: "",
     password: "",
     confirmPassword: "",
     role: "",
@@ -77,6 +79,16 @@ export default function Signup() {
       return;
     }
 
+    if (!formData.gmail) {
+      setError("Please enter your Gmail address");
+      return;
+    }
+
+    if (!formData.gmail.includes("@gmail.com")) {
+      setError("Please enter a valid Gmail address");
+      return;
+    }
+
     // Only require city and office for technicians, not admins
     if (formData.role === "technician") {
       if (!formData.city) {
@@ -98,6 +110,7 @@ export default function Signup() {
       const userData = {
         username: formData.username,
         name: formData.name,
+        gmail: formData.gmail,
         password: formData.password,
         role: formData.role,
         city: formData.role === "admin" ? null : formData.city,
@@ -216,6 +229,24 @@ export default function Signup() {
                   type="text"
                   placeholder="Enter your full name"
                   value={formData.name}
+                  onChange={handleInputChange}
+                  className="pl-10"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="gmail">Gmail</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="gmail"
+                  name="gmail"
+                  type="email"
+                  placeholder="Enter your Gmail address"
+                  value={formData.gmail}
                   onChange={handleInputChange}
                   className="pl-10"
                   required

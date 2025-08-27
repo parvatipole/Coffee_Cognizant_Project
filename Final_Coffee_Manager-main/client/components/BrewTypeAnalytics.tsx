@@ -165,7 +165,7 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
         </div>
 
         {/* Simple Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
             <div className="text-xl font-bold text-blue-700">{brewTypesData[0].name}</div>
             <div className="text-sm text-blue-600">Most Popular</div>
@@ -179,13 +179,6 @@ export default function BrewTypeAnalytics({ machineId, className }: BrewTypeAnal
             </div>
             <div className="text-sm text-green-600">Brew Types</div>
             <div className="text-xs text-muted-foreground mt-1">Available</div>
-          </div>
-          <div className="text-center p-4 bg-amber-50 rounded-lg border border-amber-200">
-            <div className="text-xl font-bold text-amber-700">
-              {Math.round(getTotalCups() / brewTypesData.length)}
-            </div>
-            <div className="text-sm text-amber-600">Avg per Type</div>
-            <div className="text-xs text-muted-foreground mt-1">Cups</div>
           </div>
         </div>
       </CardContent>
