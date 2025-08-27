@@ -787,9 +787,11 @@ export default function MachineManagement({
           <div className="flex items-center gap-3">
             <InteractiveBreadcrumb
               backUrl={
-                machineId && user?.officeName
-                  ? `/office/${officeNameToPath(user.officeName)}`
-                  : "/dashboard"
+                user?.role === "technician"
+                  ? (machineId && user?.officeName
+                      ? `/office/${officeNameToPath(user.officeName)}`
+                      : "/dashboard")
+                  : "/dashboard" // Admins go back to location selection
               }
               className="flex-1"
             />
