@@ -1,6 +1,7 @@
 import "./global.css";
 import "./lib/errorHandler"; // Global error handling for demo mode
 import "./lib/rechartsSuppress"; // Suppress Recharts defaultProps warnings
+import "./lib/verifyStatusPersistence"; // Load status persistence verification
 
 import { Toaster } from "@/components/ui/toaster";
 import { createRoot } from "react-dom/client";
