@@ -576,7 +576,7 @@ export default function MachineManagement({
         console.log('Backend unavailable, saved locally only:', apiError.message);
       }
 
-      setIsEditing(false);
+      // Changes saved successfully
     } catch (error) {
       console.error("Failed to save machine data:", error);
     } finally {
