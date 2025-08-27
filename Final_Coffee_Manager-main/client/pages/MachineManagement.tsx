@@ -52,6 +52,10 @@ interface MachineData {
   id: string;
   name: string;
   location: string;
+  status: "operational" | "maintenance" | "offline";
+  powerStatus: "online" | "offline";
+  electricityStatus: "available" | "unavailable";
+  lastPowerUpdate: string;
   lastMaintenance: string;
   nextMaintenance: string;
   supplies: {
@@ -70,6 +74,8 @@ interface MachineData {
     weeklyCups: number;
   };
   notes: string;
+  alerts?: any[];
+  recentRefills?: any[];
 }
 
 interface MachineManagementProps {
