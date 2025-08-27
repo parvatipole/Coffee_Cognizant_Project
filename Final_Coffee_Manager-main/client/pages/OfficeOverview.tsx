@@ -775,7 +775,11 @@ export default function OfficeOverview() {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <InteractiveBreadcrumb
-              backUrl={user?.role === "admin" ? "/dashboard" : "/dashboard"}
+              backUrl={
+                user?.role === "admin"
+                  ? "/dashboard" // Admins go back to location selection (Pune/Mumbai page)
+                  : "/dashboard" // Technicians go back to their machine overview
+              }
               className="flex-1"
             />
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center animate-pulse">
