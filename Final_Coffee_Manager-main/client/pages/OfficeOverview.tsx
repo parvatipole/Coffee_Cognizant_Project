@@ -774,7 +774,10 @@ export default function OfficeOverview() {
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <InteractiveBreadcrumb backUrl="/dashboard" className="flex-1" />
+            <InteractiveBreadcrumb
+              backUrl={user?.role === "admin" ? "/dashboard" : "/dashboard"}
+              className="flex-1"
+            />
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center animate-pulse">
               <Coffee className="w-5 h-5 text-primary-foreground" />
             </div>
