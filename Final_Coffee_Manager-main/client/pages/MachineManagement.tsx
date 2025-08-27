@@ -642,10 +642,32 @@ export default function MachineManagement({
 
     console.log(`🔄 Refilling ${supplyKey}: ${currentValue}% → ${newValue}%`);
 
+    // Add to recent refills
+    const supplyNames = {
+      water: 'Water Tank',
+      milk: 'Milk Container',
+      coffeeBeans: 'Coffee Beans',
+      sugar: 'Sugar Container'
+    };
+
+    const newRefill = {
+      id: `refill-${supplyKey}-${Date.now()}`,
+      supplyType: supplyKey,
+      supplyName: supplyNames[supplyKey as keyof typeof supplyNames],
+      amount: newValue,
+      refillAmount: amount,
+      timestamp: new Date().toISOString(),
+      technician: user?.name || 'Technician',
+      timeAgo: 'Just now'
+    };
+
+    const updatedRefills = [newRefill, ...(machineData.recentRefills || [])].slice(0, 10); // Keep last 10 refills
+
     // Create updated machine data
     const updatedMachineData = {
       ...machineData,
       supplies: updatedSupplies,
+      recentRefills: updatedRefills,
     };
 
     // Update local state immediately for responsive UI
