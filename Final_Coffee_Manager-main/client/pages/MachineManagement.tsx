@@ -820,8 +820,8 @@ export default function MachineManagement({
             </Badge>
             {canEdit && (
               <Button
-                onClick={() => (isEditing ? handleSave() : setIsEditing(true))}
-                variant={isEditing ? "default" : "outline"}
+                onClick={handleSave}
+                variant="default"
                 disabled={isLoading}
                 className="hover:scale-105 transition-transform"
               >
@@ -830,15 +830,10 @@ export default function MachineManagement({
                     <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
                     Saving...
                   </>
-                ) : isEditing ? (
+                ) : (
                   <>
                     <Save className="w-4 h-4 mr-2" />
                     Save Changes
-                  </>
-                ) : (
-                  <>
-                    <Edit3 className="w-4 h-4 mr-2" />
-                    Edit
                   </>
                 )}
               </Button>
