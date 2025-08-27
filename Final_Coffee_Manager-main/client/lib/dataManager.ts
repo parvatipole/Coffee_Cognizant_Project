@@ -8,6 +8,10 @@ interface MachineData {
   location: string;
   office: string;
   floor?: string;
+  status: 'operational' | 'maintenance' | 'offline';
+  powerStatus: 'online' | 'offline';
+  electricityStatus: 'available' | 'unavailable';
+  lastPowerUpdate: string;
   lastMaintenance: string;
   nextMaintenance: string;
   supplies: {
@@ -28,6 +32,7 @@ interface MachineData {
   };
   notes: string;
   alerts?: any[];
+  recentRefills?: any[];
 }
 
 const STORAGE_KEYS = {
