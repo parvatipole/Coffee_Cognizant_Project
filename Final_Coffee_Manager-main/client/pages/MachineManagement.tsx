@@ -238,6 +238,7 @@ export default function MachineManagement({
           location: "Koregaon Park Office - Ground Floor",
           status: "operational" as const,
           powerStatus: "online" as const,
+          electricityStatus: "available" as const,
           lastPowerUpdate: "2024-01-16 10:15",
           lastMaintenance: "2024-01-05",
           nextMaintenance: "2024-02-05",
