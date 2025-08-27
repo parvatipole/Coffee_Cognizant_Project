@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { apiClient, tokenManager } from "@/lib/api";
-import { initializeMQTT } from "@/lib/mqtt";
+import { initializeMQTT, mqttClient } from "@/lib/mqtt";
 import { USER_ROLES, DEMO_CREDENTIALS } from "@/config";
 import { generateDemoUsers } from "@/config/machines";
 import { dataManager } from "@/lib/dataManager";
@@ -212,7 +212,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     tokenManager.removeToken();
 
     // Disconnect MQTT
-    const { mqttClient } = await import("@/lib/mqtt");
     mqttClient.disconnect();
   };
 
