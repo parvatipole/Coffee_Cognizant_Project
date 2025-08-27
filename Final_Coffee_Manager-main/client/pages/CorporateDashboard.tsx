@@ -534,18 +534,31 @@ export default function CorporateDashboard() {
           return acc;
         }, {} as Record<string, any[]>);
 
-        // Merge stored machines into the locations structure
+        // Merge stored machines into the locations structure - REPLACE existing machines with updated versions
         loadedLocations = loadedLocations.map(location => ({
           ...location,
           offices: location.offices.map(office => {
             const storedMachinesForOffice = machinesByOffice[office.name] || [];
-            // Filter out duplicates by ID
-            const existingIds = office.machines.map(m => m.id);
-            const newMachines = storedMachinesForOffice.filter(m => !existingIds.includes(m.id));
+
+            // Create updated machines list by replacing existing machines with their updated versions
+            let updatedMachines = [...office.machines];
+
+            storedMachinesForOffice.forEach(storedMachine => {
+              const existingIndex = updatedMachines.findIndex(m => m.id === storedMachine.id);
+              if (existingIndex !== -1) {
+                // REPLACE existing machine with updated version from shared storage
+                updatedMachines[existingIndex] = storedMachine;
+                console.log(`🔄 ADMIN: Updated machine ${storedMachine.id} status to ${storedMachine.status}`);
+              } else {
+                // ADD new machine if it doesn't exist
+                updatedMachines.push(storedMachine);
+                console.log(`➕ ADMIN: Added new machine ${storedMachine.id}`);
+              }
+            });
 
             return {
               ...office,
-              machines: [...office.machines, ...newMachines]
+              machines: updatedMachines
             };
           })
         }));

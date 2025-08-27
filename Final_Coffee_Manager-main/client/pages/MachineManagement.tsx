@@ -598,6 +598,7 @@ export default function MachineManagement({
       electricityStatus: newElectricityStatus,
       status: newStatus,
       powerStatus: newPowerStatus,
+      office: machineData.office || user?.officeName || "Unknown Office", // Ensure office field exists
       lastPowerUpdate: new Date().toLocaleString("en-US", {
         year: "numeric",
         month: "2-digit",
@@ -685,7 +686,7 @@ export default function MachineManagement({
       });
       console.log('📡 Supplies updated in backend successfully');
     } catch (error) {
-      console.log('⚠️ Backend unavailable, saved supplies locally only:', (error as any).message);
+      console.log('���️ Backend unavailable, saved supplies locally only:', (error as any).message);
     }
   };
 
@@ -701,6 +702,7 @@ export default function MachineManagement({
     const updatedData = {
       ...machineData,
       powerStatus: newStatus,
+      office: machineData.office || user?.officeName || "Unknown Office", // Ensure office field exists
       lastPowerUpdate: new Date().toLocaleString("en-US", {
         year: "numeric",
         month: "2-digit",
