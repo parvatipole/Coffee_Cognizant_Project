@@ -502,11 +502,8 @@ export default function MachineManagement({
 
   const canEdit = user?.role === "technician";
 
-  // Alert management state - now dynamic based on machine condition
-  const [alerts, setAlerts] = useState(() => {
-    // Generate initial alerts based on machine condition
-    return generateDynamicAlerts(machineData);
-  });
+  // Alert management state - initialized empty, populated after data loads
+  const [alerts, setAlerts] = useState<any[]>([]);
 
   // Update alerts when machine data changes
   useEffect(() => {
