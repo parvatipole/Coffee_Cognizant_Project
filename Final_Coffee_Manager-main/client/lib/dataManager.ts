@@ -37,6 +37,7 @@ interface MachineData {
 
 const STORAGE_KEYS = {
   MACHINES: 'coffee_machines',
+  SHARED_MACHINES: 'coffee_shared_machines', // Shared storage for cross-user visibility
   LAST_SYNC: 'coffee_last_sync',
 } as const;
 
