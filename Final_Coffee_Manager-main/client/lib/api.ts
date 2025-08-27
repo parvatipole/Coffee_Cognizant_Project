@@ -378,46 +378,52 @@ class ApiClient {
 
   // Location navigation endpoints
   async getLocations() {
-    const uniqueLocations = [...new Set(standaloneData.machines.map(m => m.office))];
+    const machines = sharedDataManager.getMachines();
+    const uniqueLocations = [...new Set(machines.map((m: any) => m.office))];
     return this.makeRequest<string[]>("/machines/locations").catch(() => uniqueLocations);
   }
 
   async getOffices(location: string) {
-    const offices = standaloneData.machines
-      .filter(m => m.office === location)
-      .map(m => m.office);
+    const machines = sharedDataManager.getMachines();
+    const offices = machines
+      .filter((m: any) => m.office === location)
+      .map((m: any) => m.office);
     return this.makeRequest<string[]>(`/machines/offices?location=${encodeURIComponent(location)}`)
       .catch(() => [...new Set(offices)]);
   }
 
   async getFloors(location: string, office: string) {
-    const floors = standaloneData.machines
-      .filter(m => m.office === office)
-      .map(m => m.floor);
+    const machines = sharedDataManager.getMachines();
+    const floors = machines
+      .filter((m: any) => m.office === office)
+      .map((m: any) => m.floor);
     return this.makeRequest<string[]>(`/machines/floors?location=${encodeURIComponent(location)}&office=${encodeURIComponent(office)}`)
       .catch(() => [...new Set(floors)]);
   }
 
   async getMachinesByLocationOfficeFloor(location: string, office: string, floor: string) {
-    const machines = standaloneData.machines.filter(m => 
+    const machines = sharedDataManager.getMachines();
+    const filteredMachines = machines.filter((m: any) =>
       m.office === office && m.floor === floor
     );
     return this.makeRequest<any[]>(`/machines/by-location-office-floor?location=${encodeURIComponent(location)}&office=${encodeURIComponent(office)}&floor=${encodeURIComponent(floor)}`)
-      .catch(() => machines);
+      .catch(() => filteredMachines);
   }
 
   // Monitoring endpoints
   async getLowSupplyMachines(threshold: number = 30) {
-    const lowSupplyMachines = standaloneData.machines.filter(m =>
-      Object.values(m.supplies).some(supply => supply < threshold)
+    const machines = sharedDataManager.getMachines();
+    const lowSupplyMachines = machines.filter((m: any) =>
+      Object.values(m.supplies).some((supply: any) => supply < threshold)
     );
     return this.makeRequest<any[]>(`/machines/low-supplies?threshold=${threshold}`)
       .catch(() => lowSupplyMachines);
   }
 
   async getMaintenanceNeededMachines() {
-    const maintenanceMachines = standaloneData.machines.filter(m =>
-      m.maintenance.filterStatus === 'needs_replacement' || 
+    const machines = sharedDataManager.getMachines();
+    const maintenanceMachines = machines.filter((m: any) =>
+      m.maintenance.filterStatus === 'needs_replacement' ||
       m.maintenance.cleaningStatus === 'needs_cleaning'
     );
     return this.makeRequest<any[]>("/machines/maintenance-needed")
