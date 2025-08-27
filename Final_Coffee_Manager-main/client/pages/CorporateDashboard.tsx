@@ -667,6 +667,65 @@ export default function CorporateDashboard() {
     }
   };
 
+  // Handle delete machine
+  const handleDeleteMachine = (machine: MachineData) => {
+    setMachineToDelete(machine);
+    setIsDeleteMachineDialogOpen(true);
+  };
+
+  const handleConfirmDeleteMachine = async () => {
+    if (!machineToDelete) return;
+
+    setIsDeletingMachine(true);
+
+    try {
+      // Remove from localStorage first
+      dataManager.removeMachine(machineToDelete.id);
+
+      // Try to delete from backend
+      try {
+        await apiClient.deleteMachine(machineToDelete.id);
+        console.log('Machine deleted from backend successfully');
+      } catch (error) {
+        console.log('Backend unavailable, deleted locally only:', error.message);
+        // Still continue with local deletion for offline functionality
+      }
+
+      // Update the machines list
+      setMachines(prev => prev.filter(m => m.id !== machineToDelete.id));
+
+      // Update the office data in the locations array
+      setLocations(prevLocations =>
+        prevLocations.map(location => ({
+          ...location,
+          offices: location.offices.map(office => ({
+            ...office,
+            machines: office.machines.filter(m => m.id !== machineToDelete.id)
+          }))
+        }))
+      );
+
+      // Clear selection if deleted machine was selected
+      if (selectedMachine === machineToDelete.id) {
+        setSelectedMachine("");
+      }
+
+      setIsDeleteMachineDialogOpen(false);
+      setMachineToDelete(null);
+
+      // Show success message
+      toast.success(SUCCESS_MESSAGES.MACHINE_DELETED);
+
+      console.log('Machine deleted successfully:', machineToDelete.id);
+
+    } catch (error) {
+      console.error('Failed to delete machine:', error);
+      toast.error('Failed to delete machine. Please try again.');
+    } finally {
+      setIsDeletingMachine(false);
+    }
+  };
+
   const getLocationData = (locationName: string) => {
     return corporateLocations.find((l) => l.name === locationName);
   };
