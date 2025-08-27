@@ -474,6 +474,30 @@ export default function MachineManagement({
     };
 
     loadMachineData();
+
+    // Listen for storage changes to detect updates from other tabs/users
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'coffee_shared_machines' && e.newValue !== e.oldValue) {
+        console.log('🔄 MACHINE DETAIL: Detected storage change, reloading machine data...');
+        loadMachineData();
+      }
+    };
+
+    const handleMachineDataChanged = (e: CustomEvent) => {
+      // Check if this machine was updated
+      if (e.detail?.machine?.id === machineId || e.detail?.machine?.machineId === machineId) {
+        console.log('🔄 MACHINE DETAIL: Machine data changed event received, reloading...');
+        loadMachineData();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('machineDataChanged', handleMachineDataChanged as EventListener);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('machineDataChanged', handleMachineDataChanged as EventListener);
+    };
   }, [machineId]);
 
   const canEdit = user?.role === "technician";
