@@ -127,6 +127,7 @@ export const dataManager = {
 
       // Also sync to shared storage for cross-user visibility
       dataManager.syncToSharedStorage(machines[machineIndex]);
+      console.log(`🔄 SUPPLY REFILL: Machine ${id} supplies synced to shared storage`);
     }
   },
 
