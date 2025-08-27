@@ -1,8 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { apiClient, tokenManager } from "@/lib/api";
 import { initializeMQTT } from "@/lib/mqtt";
+import { USER_ROLES, DEMO_CREDENTIALS } from "@/config";
+import { generateDemoUsers } from "@/config/machines";
 
-export type UserRole = "technician" | "admin";
+export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
 
 export interface User {
   id: string;
@@ -127,36 +129,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     username: string,
     password: string,
   ): Promise<boolean> => {
-    // Fallback to mock authentication for demo purposes
-    const mockUsers = [
-      {
-        id: "1",
-        username: "tech1",
-        role: "technician",
-        name: "John Technician",
-        city: "pune",
-        officeName: "Hinjewadi IT Park",
-      },
-      {
-        id: "3",
-        username: "tech2",
-        role: "technician",
-        name: "Priya Shah",
-        city: "mumbai",
-        officeName: "Mumbai BKC",
-      },
-      {
-        id: "2",
-        username: "admin1",
-        role: "admin",
-        name: "Sarah Admin",
-        city: null,
-        officeName: null, // Admin has access to all offices
-      },
-    ];
+    // Use dynamically generated demo users
+    const mockUsers = generateDemoUsers();
 
     const foundUser = mockUsers.find((u) => u.username === username);
-    if (foundUser && (password === "password" || password === username)) {
+    const isValidPassword = password === DEMO_CREDENTIALS.DEFAULT_PASSWORD ||
+                           (DEMO_CREDENTIALS.ALLOW_USERNAME_AS_PASSWORD && password === username);
+
+    if (foundUser && isValidPassword) {
       // Create mock JWT token
       const mockToken = btoa(
         JSON.stringify({
