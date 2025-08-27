@@ -393,11 +393,17 @@ export default function MachineManagement({
       officeMachines[targetOffice as keyof typeof officeMachines] ||
       officeMachines["Hinjewadi IT Park"];
 
-    // Add default power status if not present (for backward compatibility)
+    // Add default power status and electricity status if not present (for backward compatibility)
     const result = machineData as any;
     if (!result.powerStatus) {
       result.powerStatus = result.status === "offline" ? "offline" : "online";
       result.lastPowerUpdate = "2024-01-16 10:00";
+    }
+    if (!result.electricityStatus) {
+      result.electricityStatus = "available";
+    }
+    if (!result.recentRefills) {
+      result.recentRefills = [];
     }
 
     return result as MachineData;
