@@ -1,25 +1,28 @@
 // API Configuration and JWT Token Management
 // STANDALONE MODE: Frontend works independently, ready for backend integration
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
-const STANDALONE_MODE = import.meta.env.VITE_STANDALONE_MODE !== "false"; // Default to standalone
+import { ENV_CONFIG, STORAGE_KEYS, API_ENDPOINTS, ALERT_THRESHOLDS, USER_ROLES } from "@/config";
+import { generateDemoMachines } from "@/config/machines";
+
+const API_BASE_URL = ENV_CONFIG.API_BASE_URL;
+const STANDALONE_MODE = ENV_CONFIG.STANDALONE_MODE;
 
 // Debug logging for local development
-const DEBUG = import.meta.env.VITE_DEBUG === "true" || import.meta.env.DEV;
+const DEBUG = ENV_CONFIG.DEBUG;
 
 // Token management
 export const tokenManager = {
   getToken: (): string | null => {
-    return localStorage.getItem("coffee_auth_token");
+    return localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
   },
 
   setToken: (token: string): void => {
-    localStorage.setItem("coffee_auth_token", token);
+    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
   },
 
   removeToken: (): void => {
-    localStorage.removeItem("coffee_auth_token");
-    localStorage.removeItem("coffee_auth_user");
+    localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.AUTH_USER);
   },
 
   isTokenExpired: (token: string): boolean => {
@@ -34,83 +37,10 @@ export const tokenManager = {
 };
 
 // Shared data storage for standalone mode - ensures all users see the same data
-const SHARED_MACHINES_KEY = 'coffee_shared_machines';
+const SHARED_MACHINES_KEY = STORAGE_KEYS.SHARED_MACHINES;
 
-// Default machine data for first-time initialization
-const defaultMachineData = [
-  {
-    id: "HIJ-001",
-    machineId: "HIJ-001",
-    name: "Coffee Station Alpha",
-    location: "Hinjewadi IT Park - Building A2",
-    office: "Hinjewadi IT Park",
-    floor: "Floor 3",
-    status: "operational",
-    powerStatus: "online",
-    electricityStatus: "available",
-    lastPowerUpdate: "2024-01-16 09:30",
-    lastMaintenance: "2024-01-10",
-    nextMaintenance: "2024-02-10",
-    supplies: { water: 85, milk: 60, coffee: 75, sugar: 90 },
-    maintenance: {
-      filterStatus: "good",
-      cleaningStatus: "clean",
-      pressure: 15,
-    },
-    usage: { dailyCups: 127, weeklyCups: 890 },
-    notes: "Machine running smoothly. Recent cleaning completed on schedule.",
-    alerts: [],
-    recentRefills: []
-  },
-  {
-    id: "HIJ-002",
-    machineId: "HIJ-002",
-    name: "Espresso Hub Beta",
-    location: "Hinjewadi IT Park - Building B1",
-    office: "Hinjewadi IT Park",
-    floor: "Floor 2",
-    status: "operational",
-    powerStatus: "online",
-    electricityStatus: "available",
-    lastPowerUpdate: "2024-01-16 08:45",
-    lastMaintenance: "2024-01-12",
-    nextMaintenance: "2024-02-12",
-    supplies: { water: 92, milk: 45, coffee: 88, sugar: 76 },
-    maintenance: {
-      filterStatus: "good",
-      cleaningStatus: "clean",
-      pressure: 14,
-    },
-    usage: { dailyCups: 98, weeklyCups: 686 },
-    notes: "High performance. Minor calibration needed.",
-    alerts: [],
-    recentRefills: []
-  },
-  {
-    id: "KOR-001",
-    machineId: "KOR-001",
-    name: "Executive Espresso",
-    location: "Koregaon Park Office - Ground Floor",
-    office: "Koregaon Park Office",
-    floor: "Floor 1",
-    status: "operational",
-    powerStatus: "online",
-    electricityStatus: "available",
-    lastPowerUpdate: "2024-01-16 10:15",
-    lastMaintenance: "2024-01-05",
-    nextMaintenance: "2024-02-05",
-    supplies: { water: 78, milk: 80, coffee: 65, sugar: 95 },
-    maintenance: {
-      filterStatus: "good",
-      cleaningStatus: "clean",
-      pressure: 12,
-    },
-    usage: { dailyCups: 89, weeklyCups: 650 },
-    notes: "Popular machine. Consistent performance.",
-    alerts: [],
-    recentRefills: []
-  }
-];
+// Get default machine data from dynamic configuration
+const getDefaultMachineData = () => generateDemoMachines();
 
 // Shared data manager for standalone mode
 const sharedDataManager = {
@@ -119,15 +49,16 @@ const sharedDataManager = {
     try {
       const stored = localStorage.getItem(SHARED_MACHINES_KEY);
       if (!stored) {
-        // Initialize with default data if not exists
+        // Initialize with dynamically generated default data if not exists
+        const defaultData = getDefaultMachineData();
         console.log('🔧 Initializing shared machine data for standalone mode');
-        localStorage.setItem(SHARED_MACHINES_KEY, JSON.stringify(defaultMachineData));
-        return defaultMachineData;
+        localStorage.setItem(SHARED_MACHINES_KEY, JSON.stringify(defaultData));
+        return defaultData;
       }
       return JSON.parse(stored);
     } catch (error) {
       console.warn('Failed to load shared machines data:', error);
-      return defaultMachineData;
+      return getDefaultMachineData();
     }
   },
 
@@ -201,7 +132,7 @@ class ApiClient {
       const response = await fetch(url, {
         ...options,
         headers,
-        signal: AbortSignal.timeout(10000), // 10 second timeout
+        signal: AbortSignal.timeout(ENV_CONFIG.REQUEST_TIMEOUT),
       });
 
       // Handle authentication errors
@@ -250,7 +181,7 @@ class ApiClient {
 
     // Handle different endpoints in standalone mode using shared data storage
     switch (true) {
-      case endpoint === '/machines' && method === 'GET':
+      case endpoint === API_ENDPOINTS.MACHINES && method === 'GET':
         const allMachines = sharedDataManager.getMachines();
         console.log('🔄 Shared data: Retrieved all machines from shared storage');
         return allMachines as T;
@@ -285,27 +216,30 @@ class ApiClient {
           throw new Error('Machine not found');
         }
 
-      case endpoint === '/auth/signin' && method === 'POST':
+      case endpoint === API_ENDPOINTS.SIGNIN && method === 'POST':
         const { username, password } = JSON.parse(options.body as string);
         // Simple standalone authentication
         if (username && password) {
-          const token = btoa(JSON.stringify({ username, exp: Date.now() / 1000 + 3600 }));
+          const token = btoa(JSON.stringify({
+            username,
+            exp: Date.now() / 1000 + (ENV_CONFIG.TOKEN_EXPIRY_HOURS * 3600)
+          }));
           return {
             accessToken: token,
             tokenType: "Bearer",
             id: 1,
             username,
             name: username.charAt(0).toUpperCase() + username.slice(1),
-            role: username.includes('tech') ? 'technician' : 'employee',
+            role: username.includes('tech') ? USER_ROLES.TECHNICIAN : USER_ROLES.ADMIN,
             authorities: []
           } as T;
         }
         throw new Error('Invalid credentials');
 
-      case endpoint === '/auth/signup' && method === 'POST':
+      case endpoint === API_ENDPOINTS.SIGNUP && method === 'POST':
         return { message: "User registered successfully" } as T;
 
-      case endpoint === '/auth/signout' && method === 'POST':
+      case endpoint === API_ENDPOINTS.SIGNOUT && method === 'POST':
         return { message: "Signed out successfully" } as T;
 
       default:
@@ -323,54 +257,54 @@ class ApiClient {
       name: string;
       role: string;
       authorities: string[];
-    }>("/auth/signin", {
+    }>(API_ENDPOINTS.SIGNIN, {
       method: "POST",
       body: JSON.stringify({ username, password }),
     });
   }
 
   async signup(username: string, name: string, password: string, officeName: string) {
-    return this.makeRequest<{ message: string }>("/auth/signup", {
+    return this.makeRequest<{ message: string }>(API_ENDPOINTS.SIGNUP, {
       method: "POST",
       body: JSON.stringify({ username, name, password, officeName }),
     });
   }
 
   async logout() {
-    return this.makeRequest("/auth/signout", {
+    return this.makeRequest(API_ENDPOINTS.SIGNOUT, {
       method: "POST",
     });
   }
 
   // Coffee Machines endpoints
   async getMachines() {
-    return this.makeRequest<any[]>("/machines");
+    return this.makeRequest<any[]>(API_ENDPOINTS.MACHINES);
   }
 
   async createMachine(machineData: any) {
-    return this.makeRequest<any>("/machines", {
+    return this.makeRequest<any>(API_ENDPOINTS.MACHINES, {
       method: "POST",
       body: JSON.stringify(machineData),
     });
   }
 
   async getMachine(id: string) {
-    return this.makeRequest<any>(`/machines/${id}`);
+    return this.makeRequest<any>(API_ENDPOINTS.MACHINE_BY_ID(id));
   }
 
   async getMachineByMachineId(machineId: string) {
-    return this.makeRequest<any>(`/machines/machine/${machineId}`);
+    return this.makeRequest<any>(API_ENDPOINTS.MACHINE_BY_MACHINE_ID(machineId));
   }
 
   async updateMachine(id: string, data: any) {
-    return this.makeRequest<any>(`/machines/${id}`, {
+    return this.makeRequest<any>(API_ENDPOINTS.MACHINE_BY_ID(id), {
       method: "PUT",
       body: JSON.stringify(data),
     });
   }
 
   async updateSupplies(id: string, supplies: any) {
-    return this.makeRequest<{ message: string }>(`/machines/${id}/supplies`, {
+    return this.makeRequest<{ message: string }>(API_ENDPOINTS.MACHINE_SUPPLIES(id), {
       method: "PUT",
       body: JSON.stringify(supplies),
     });
@@ -380,7 +314,7 @@ class ApiClient {
   async getLocations() {
     const machines = sharedDataManager.getMachines();
     const uniqueLocations = [...new Set(machines.map((m: any) => m.office))];
-    return this.makeRequest<string[]>("/machines/locations").catch(() => uniqueLocations);
+    return this.makeRequest<string[]>(API_ENDPOINTS.LOCATIONS).catch(() => uniqueLocations);
   }
 
   async getOffices(location: string) {
@@ -388,7 +322,7 @@ class ApiClient {
     const offices = machines
       .filter((m: any) => m.office === location)
       .map((m: any) => m.office);
-    return this.makeRequest<string[]>(`/machines/offices?location=${encodeURIComponent(location)}`)
+    return this.makeRequest<string[]>(`${API_ENDPOINTS.OFFICES}?location=${encodeURIComponent(location)}`)
       .catch(() => [...new Set(offices)]);
   }
 
@@ -397,7 +331,7 @@ class ApiClient {
     const floors = machines
       .filter((m: any) => m.office === office)
       .map((m: any) => m.floor);
-    return this.makeRequest<string[]>(`/machines/floors?location=${encodeURIComponent(location)}&office=${encodeURIComponent(office)}`)
+    return this.makeRequest<string[]>(`${API_ENDPOINTS.FLOORS}?location=${encodeURIComponent(location)}&office=${encodeURIComponent(office)}`)
       .catch(() => [...new Set(floors)]);
   }
 
@@ -406,17 +340,17 @@ class ApiClient {
     const filteredMachines = machines.filter((m: any) =>
       m.office === office && m.floor === floor
     );
-    return this.makeRequest<any[]>(`/machines/by-location-office-floor?location=${encodeURIComponent(location)}&office=${encodeURIComponent(office)}&floor=${encodeURIComponent(floor)}`)
+    return this.makeRequest<any[]>(`${API_ENDPOINTS.MACHINES_BY_LOCATION}?location=${encodeURIComponent(location)}&office=${encodeURIComponent(office)}&floor=${encodeURIComponent(floor)}`)
       .catch(() => filteredMachines);
   }
 
   // Monitoring endpoints
-  async getLowSupplyMachines(threshold: number = 30) {
+  async getLowSupplyMachines(threshold: number = ALERT_THRESHOLDS.LOW_SUPPLY_WARNING) {
     const machines = sharedDataManager.getMachines();
     const lowSupplyMachines = machines.filter((m: any) =>
       Object.values(m.supplies).some((supply: any) => supply < threshold)
     );
-    return this.makeRequest<any[]>(`/machines/low-supplies?threshold=${threshold}`)
+    return this.makeRequest<any[]>(`${API_ENDPOINTS.LOW_SUPPLY_MACHINES}?threshold=${threshold}`)
       .catch(() => lowSupplyMachines);
   }
 
@@ -426,7 +360,7 @@ class ApiClient {
       m.maintenance.filterStatus === 'needs_replacement' ||
       m.maintenance.cleaningStatus === 'needs_cleaning'
     );
-    return this.makeRequest<any[]>("/machines/maintenance-needed")
+    return this.makeRequest<any[]>(API_ENDPOINTS.MAINTENANCE_NEEDED)
       .catch(() => maintenanceMachines);
   }
 }
