@@ -92,6 +92,72 @@ export default function MachineManagement({
   const [isLoading, setIsLoading] = useState(false);
   const [isEditingElectricity, setIsEditingElectricity] = useState(false);
 
+  // Generate dynamic alerts based on machine condition
+  const generateDynamicAlerts = (machine: MachineData): any[] => {
+    const alerts: any[] = [];
+
+    // Generate alerts for low supplies (< 20%)
+    Object.entries(machine.supplies).forEach(([key, value]) => {
+      if (value < 20) {
+        const supplyNames = {
+          water: 'Water Tank',
+          milk: 'Milk Container',
+          coffeeBeans: 'Coffee Beans',
+          sugar: 'Sugar Container'
+        };
+        alerts.push({
+          id: `supply-${key}-${Date.now()}`,
+          type: 'warning',
+          title: `${supplyNames[key as keyof typeof supplyNames]} Running Low`,
+          description: `${value}% remaining - refill recommended`,
+          category: 'supply',
+          resolved: false,
+          createdAt: new Date().toISOString()
+        });
+      }
+    });
+
+    // Electricity status alerts
+    if (machine.electricityStatus === 'unavailable') {
+      alerts.push({
+        id: `electricity-${Date.now()}`,
+        type: 'critical',
+        title: 'Electricity Unavailable',
+        description: 'Machine cannot operate without power supply',
+        category: 'system',
+        resolved: false,
+        createdAt: new Date().toISOString()
+      });
+    }
+
+    // Maintenance alerts
+    if (machine.maintenance.filterStatus === 'needs_replacement') {
+      alerts.push({
+        id: `filter-${Date.now()}`,
+        type: 'warning',
+        title: 'Filter Replacement Required',
+        description: 'Water filter needs replacement',
+        category: 'maintenance',
+        resolved: false,
+        createdAt: new Date().toISOString()
+      });
+    }
+
+    if (machine.maintenance.cleaningStatus === 'needs_cleaning') {
+      alerts.push({
+        id: `cleaning-${Date.now()}`,
+        type: 'info',
+        title: 'Cleaning Required',
+        description: 'Machine needs scheduled cleaning',
+        category: 'cleaning',
+        resolved: false,
+        createdAt: new Date().toISOString()
+      });
+    }
+
+    return alerts;
+  };
+
   // Get machine data by ID (searches localStorage first, then static data)
   const getMachineDataById = (id: string): MachineData | null => {
     // First check localStorage for updated data
