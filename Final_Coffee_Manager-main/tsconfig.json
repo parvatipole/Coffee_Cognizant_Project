@@ -33,6 +33,7 @@
   },
   "include": [
     "client/**/*",
+    "server/**/*",
     "vite.config.ts"
   ],
   "exclude": ["node_modules", "dist"]
