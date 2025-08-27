@@ -96,6 +96,18 @@ const sharedDataManager = {
       return machines[machineIndex];
     }
     throw new Error('Machine not found in shared storage');
+  },
+
+  // Delete machine from shared storage
+  deleteMachine: (id: string) => {
+    const machines = sharedDataManager.getMachines();
+    const filteredMachines = machines.filter((m: any) => m.id !== id && m.machineId !== id);
+    if (filteredMachines.length < machines.length) {
+      sharedDataManager.saveMachines(filteredMachines);
+      console.log(`💾 Shared data: Deleted machine ${id} from shared storage`);
+      return true;
+    }
+    throw new Error('Machine not found in shared storage');
   }
 };
 
@@ -216,6 +228,17 @@ class ApiClient {
           throw new Error('Machine not found');
         }
 
+      // DELETE /machines/:id
+      case endpoint.startsWith('/machines/') && method === 'DELETE':
+        const deleteId = endpoint.split('/')[2];
+        try {
+          sharedDataManager.deleteMachine(deleteId);
+          console.log(`✅ Shared data: Machine ${deleteId} deleted from shared storage`);
+          return { message: "Machine deleted successfully" } as T;
+        } catch (error) {
+          throw new Error('Machine not found');
+        }
+
       case endpoint === API_ENDPOINTS.SIGNIN && method === 'POST':
         const { username, password } = JSON.parse(options.body as string);
         // Simple standalone authentication
@@ -307,6 +330,12 @@ class ApiClient {
     return this.makeRequest<{ message: string }>(API_ENDPOINTS.MACHINE_SUPPLIES(id), {
       method: "PUT",
       body: JSON.stringify(supplies),
+    });
+  }
+
+  async deleteMachine(id: string) {
+    return this.makeRequest<{ message: string }>(API_ENDPOINTS.DELETE_MACHINE(id), {
+      method: "DELETE",
     });
   }
 
