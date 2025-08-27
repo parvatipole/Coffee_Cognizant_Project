@@ -475,49 +475,18 @@ export default function MachineManagement({
 
   const canEdit = user?.role === "technician";
 
-  // Alert management state
-  const [alerts, setAlerts] = useState([
-    {
-      id: "1",
-      type: "critical",
-      title: "Water filter needs immediate replacement",
-      description: "Filter life: 5%",
-      category: "maintenance",
-      resolved: false,
-      resolvedBy: null,
-      resolvedAt: null,
-    },
-    {
-      id: "2",
-      type: "warning",
-      title: "Coffee beans running low",
-      description: "15% remaining - refill recommended",
-      category: "supply",
-      resolved: false,
-      resolvedBy: null,
-      resolvedAt: null,
-    },
-    {
-      id: "3",
-      type: "info",
-      title: "Deep cleaning scheduled",
-      description: "Last cleaned 48 hours ago",
-      category: "cleaning",
-      resolved: false,
-      resolvedBy: null,
-      resolvedAt: null,
-    },
-    {
-      id: "4",
-      type: "resolved",
-      title: "Water tank refilled",
-      description: "Refilled to 100%",
-      category: "supply",
-      resolved: true,
-      resolvedBy: user?.name,
-      resolvedAt: "2 hours ago",
-    },
-  ]);
+  // Alert management state - now dynamic based on machine condition
+  const [alerts, setAlerts] = useState(() => {
+    // Generate initial alerts based on machine condition
+    return generateDynamicAlerts(machineData);
+  });
+
+  // Update alerts when machine data changes
+  useEffect(() => {
+    const dynamicAlerts = generateDynamicAlerts(machineData);
+    const existingResolvedAlerts = alerts.filter(alert => alert.resolved);
+    setAlerts([...existingResolvedAlerts, ...dynamicAlerts]);
+  }, [machineData.supplies, machineData.electricityStatus, machineData.maintenance]);
 
   // Handle alert resolution
   const handleAlertResolution = async (alertId: string) => {
