@@ -1,10 +1,8 @@
-# 🚀 Local Development Setup
+# 🚀 Coffee Manager - Local Development Setup
 
 ## Prerequisites
 
 - **Node.js 18+** and npm
-- **Java 17+** and Maven 3.6+
-- **MySQL 8.0+**
 
 ## Quick Start
 
@@ -13,7 +11,7 @@
 ```bash
 # Download or clone the project
 # Extract if downloaded as zip
-cd coffee-flow-project
+cd Final_Coffee_Manager-main
 ```
 
 ### 2. ⚡ Frontend Setup
@@ -28,83 +26,115 @@ npm run dev
 
 **Frontend:** http://localhost:5173
 
-### 3. 🗄️ Database Setup
-
-```bash
-# Start MySQL service
-# Windows: Start MySQL service from services
-# Mac: brew services start mysql
-# Linux: sudo systemctl start mysql
-
-# Create database
-mysql -u root -p
-CREATE DATABASE coffee_flow_db;
-EXIT;
-```
-
-### 4. 🔧 Backend Setup
-
-```bash
-# Navigate to backend
-cd backend
-
-# Update database credentials in src/main/resources/application.yml
-# Change username/password to match your MySQL setup
-
-# Install and run
-mvn clean install
-mvn spring-boot:run
-```
-
-**Backend:** http://localhost:8080/api
-
 ## 🧪 Testing the Setup
 
-### 1. Test Backend
-
-Visit: http://localhost:8080/api/auth/signin
-
-- Should show: `{"timestamp":"...","status":405,"error":"Method Not Allowed"}`
-- This means backend is running correctly!
-
-### 2. Test Frontend
+### Test Frontend
 
 Visit: http://localhost:5173
 
-- Should show the CoffeeFlow login page
-- Try logging in with:
-  - **Technician:** `tech1` / `password`
-  - **Admin:** `admin1` / `password`
+- Should show the Coffee Manager login page
+- Try logging in with any credentials (standalone mode):
+  - **Technician:** `tech1` / `password` (or any username with 'tech')
+  - **Employee:** `user1` / `password` (or any other username)
 
-## 🔑 Demo Accounts
+## 🎯 Standalone Mode
 
-The backend automatically creates these accounts on first run:
+The frontend currently runs in **standalone mode** with:
 
-| Username | Password | Role       | Permissions                   |
-| -------- | -------- | ---------- | ----------------------------- |
-| tech1    | password | Technician | Full access (edit everything) |
-| admin1   | password | Admin      | View-only access              |
+- ✅ **Mock authentication** (any credentials work)
+- ✅ **Demo machine data** built-in
+- ✅ **Local storage persistence** for all changes
+- ✅ **Full functionality** without backend dependency
 
-## 📡 Features
+## 🔑 Demo Features
 
 ### ✅ Working Features
 
-- **JWT Authentication** with real backend
-- **Role-based access control**
-- **Real-time MQTT simulation**
-- **Machine management** (supplies, maintenance)
-- **Location navigation** (Location → Office → Floor → Machine)
-- **Interactive dashboards** with charts
-- **Offline mode** with demo data fallback
+- **Authentication** with role simulation
+- **Role-based access control** (technician vs employee)
+- **Machine management** (supplies, maintenance, notes)
+- **Electricity status management** (available/unavailable)
+- **Dynamic alerts** based on supply levels and conditions
+- **Supply refill tracking** with history
+- **Real-time status updates**
+- **Data persistence** across browser sessions
 
-### 🎛️ API Endpoints
+### 🎛️ Machine Management
 
-- `POST /api/auth/signin` - Login
-- `GET /api/machines` - Get all machines
-- `PUT /api/machines/{id}/supplies` - Update supplies (Technician only)
-- `GET /api/machines/locations` - Get locations
-- `GET /api/machines/offices?location=X` - Get offices
-- `GET /api/machines/floors?location=X&office=Y` - Get floors
+- **View machine status** and supply levels
+- **Edit electricity status** (technicians only)
+- **Refill supplies** with automatic tracking
+- **Manage alerts** and maintenance notes
+- **Real-time analytics** and usage tracking
+
+## 🔄 Development Workflow
+
+1. **Install dependencies** (`npm install`)
+2. **Start development server** (`npm run dev`)
+3. **Open browser** to http://localhost:5173
+4. **Login** with any credentials
+5. **Develop and test** features in standalone mode
+
+## 📝 Environment Variables
+
+Current setup (standalone mode):
+
+```env
+VITE_STANDALONE_MODE=true
+VITE_API_BASE_URL=http://localhost:8080/api
+VITE_DEBUG=true
+```
+
+### Switching to Backend Integration
+
+When backend becomes available:
+
+```env
+VITE_STANDALONE_MODE=false
+VITE_API_BASE_URL=http://your-backend-url/api
+```
+
+## 🚀 Production Build
+
+```bash
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+
+# Start production server
+npm run start
+```
+
+## 📖 Project Structure
+
+```
+Final_Coffee_Manager-main/
+├── client/                    # React frontend
+│   ├── components/ui/         # UI component library
+│   ├── components/            # Coffee machine components
+│   ├── pages/                 # Route components
+│   ├── contexts/              # React contexts (Auth, etc.)
+│   ├── hooks/                 # Custom React hooks
+│   ├── lib/                   # API client & utilities
+│   ├── App.tsx               # Main app component
+│   └── global.css            # TailwindCSS styles
+├── data/                      # Static data files
+├── public/                    # Static assets
+├── BACKEND_INTEGRATION.md     # Backend integration guide
+├── AGENTS.md                  # Project documentation
+└── package.json              # Dependencies and scripts
+```
+
+## 🎨 UI Components
+
+Built with:
+- **React 18** with TypeScript
+- **TailwindCSS 3** for styling
+- **Radix UI** for accessible components
+- **Lucide React** for icons
+- **React Router 6** for navigation
 
 ## 🐛 Troubleshooting
 
@@ -115,88 +145,62 @@ The backend automatically creates these accounts on first run:
 rm -rf node_modules package-lock.json
 npm install
 
+# Clear browser cache and localStorage
+# Open DevTools → Application → Storage → Clear storage
+```
+
+### Port Issues
+
+```bash
 # Check if port 5173 is free
 netstat -tulpn | grep 5173
+
+# Start on different port
+npm run dev -- --port 3000
 ```
 
-### Backend Issues
+### Build Issues
 
 ```bash
-# Check if port 8080 is free
-netstat -tulpn | grep 8080
+# Type check
+npm run typecheck
 
-# Check if MySQL is running
-systemctl status mysql
-
-# View backend logs
-mvn spring-boot:run
-# Look for "Started CoffeeFlowApplication"
+# Format code
+npm run format.fix
 ```
 
-### Database Issues
+## 📋 Development Checklist
 
-```bash
-# Reset database
-mysql -u root -p
-DROP DATABASE coffee_flow_db;
-CREATE DATABASE coffee_flow_db;
-```
+- [ ] Node.js 18+ installed
+- [ ] Dependencies installed (`npm install`)
+- [ ] Development server running (`npm run dev`)
+- [ ] Application accessible at http://localhost:5173
+- [ ] Can login with any credentials
+- [ ] Machine management features working
+- [ ] Data persists across browser refresh
 
-### CORS Issues
+## 🔧 Backend Integration
 
-If you get CORS errors, check that backend `WebSecurityConfig.java` includes:
+When ready to integrate with backend:
 
-```java
-configuration.setAllowedOriginPatterns(Arrays.asList(
-    "http://localhost:*"
-));
-```
+1. See `BACKEND_INTEGRATION.md` for API requirements
+2. Set `VITE_STANDALONE_MODE=false`
+3. Configure `VITE_API_BASE_URL` to your backend
+4. Backend team implements required endpoints
+5. Frontend automatically switches to backend mode
 
-## 🔄 Development Workflow
+## 📚 Key Files
 
-1. **Start MySQL** service
-2. **Start Backend** (`mvn spring-boot:run`)
-3. **Start Frontend** (`npm run dev`)
-4. **Open browser** to http://localhost:5173
-5. **Login** with demo accounts
-6. **Develop and test** features
-
-## 📝 Environment Variables
-
-Create `client/.env.local`:
-
-```env
-VITE_API_BASE_URL=http://localhost:8080/api
-VITE_DEBUG=true
-```
-
-## 🚀 Production Build
-
-```bash
-# Build frontend
-npm run build
-
-# Build backend
-cd backend
-mvn clean package
-```
-
-## 📖 Project Structure
-
-```
-coffee-flow-project/
-├── client/                 # React frontend
-│   ├── src/
-│   ├── components/ui/      # UI components
-│   ├── pages/             # Route components
-│   ├── contexts/          # React contexts
-│   ├── lib/               # API & utilities
-│   └── .env.local         # Local environment
-├── backend/               # Spring Boot backend
-│   ├── src/main/java/     # Java source
-│   ├── src/main/resources/ # Configuration
-│   └── pom.xml            # Maven dependencies
-└── README.md
-```
+- `client/lib/api.ts` - API client with standalone/backend modes
+- `client/lib/dataManager.ts` - LocalStorage data management
+- `client/pages/MachineManagement.tsx` - Main machine interface
+- `client/contexts/AuthContext.tsx` - Authentication context
+- `BACKEND_INTEGRATION.md` - Backend integration guide
 
 Happy coding! 🎉
+
+## 🤝 Team Collaboration
+
+- **Frontend Team**: Can work completely independently
+- **Backend Team**: Use `BACKEND_INTEGRATION.md` for requirements
+- **Integration**: Seamless switch when backend is ready
