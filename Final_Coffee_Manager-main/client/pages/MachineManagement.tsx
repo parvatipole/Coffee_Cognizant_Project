@@ -558,8 +558,14 @@ export default function MachineManagement({
   const handleSave = async () => {
     setIsLoading(true);
     try {
+      // Ensure office field is present before saving
+      const dataToSave = {
+        ...machineData,
+        office: machineData.office || user?.officeName || "Unknown Office"
+      };
+
       // Save to localStorage immediately for offline support
-      dataManager.saveMachine(machineData);
+      dataManager.saveMachine(dataToSave);
 
       // Try to save to backend
       try {
@@ -669,6 +675,7 @@ export default function MachineManagement({
       ...machineData,
       supplies: updatedSupplies,
       recentRefills: updatedRefills,
+      office: machineData.office || user?.officeName || "Unknown Office", // Ensure office field exists
     };
 
     // Update local state immediately for responsive UI
