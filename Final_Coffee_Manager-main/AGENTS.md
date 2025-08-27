@@ -27,11 +27,11 @@ public/                   # Static assets
 
 ## Key Features
 
-### ⚡ Standalone Mode
-- Frontend works completely independently
-- No backend required for development/testing
-- Mock data and API responses built-in
-- Easy to switch to backend integration mode
+### ⚡ Hybrid Development Mode
+- Frontend works with integrated development server
+- Automatic fallback to mock data when backend endpoints not implemented
+- Seamless backend integration without configuration changes
+- Development server provides API structure for easy backend implementation
 
 ### 🔧 Machine Management
 - Real-time machine status monitoring
