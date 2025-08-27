@@ -156,22 +156,39 @@ export const dataManager = {
     }
   },
 
-  // Update entire machine
+  // Update entire machine (shared storage is authoritative)
   updateMachine: (id: string, updates: Partial<MachineData>): void => {
-    const machines = dataManager.getAllMachines();
-    const machineIndex = machines.findIndex(m => m.id === id || m.machineId === id);
+    // First, get the current machine from shared storage (authoritative source)
+    let currentMachine = dataManager.getMachineFromSharedStorage(id);
 
-    if (machineIndex !== -1) {
+    // If not in shared storage, check local storage
+    if (!currentMachine) {
+      const machines = dataManager.getAllMachines();
+      currentMachine = machines.find(m => m.id === id || m.machineId === id);
+    }
+
+    if (currentMachine) {
       const updated = normalizeMachine({
-        ...machines[machineIndex],
+        ...currentMachine,
         ...updates,
+        lastUpdated: new Date().toISOString(),
       });
-      machines[machineIndex] = updated;
-      localStorage.setItem(STORAGE_KEYS.MACHINES, JSON.stringify(machines));
 
-      // Also sync to shared storage for cross-user visibility (so admin sees changes)
+      console.log(`🔄 MACHINE UPDATE: Updating machine ${id} - status: ${currentMachine.status} → ${updated.status}`);
+
+      // Update local storage
+      const machines = dataManager.getAllMachines();
+      const machineIndex = machines.findIndex(m => m.id === id || m.machineId === id);
+      if (machineIndex !== -1) {
+        machines[machineIndex] = updated;
+        localStorage.setItem(STORAGE_KEYS.MACHINES, JSON.stringify(machines));
+      }
+
+      // CRITICAL: Always sync to shared storage for cross-user visibility
       dataManager.syncToSharedStorage(updated);
-      console.log(`🔄 MACHINE UPDATE: Updated machine ${id} synced to shared storage`);
+      console.log(`✅ MACHINE UPDATE: Machine ${id} successfully updated and synced`);
+    } else {
+      console.error(`❌ MACHINE UPDATE: Machine ${id} not found for update`);
     }
   },
 
