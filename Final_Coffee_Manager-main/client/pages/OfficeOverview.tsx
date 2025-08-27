@@ -664,6 +664,7 @@ export default function OfficeOverview() {
   }, [officeName]);
 
   const canEdit = user?.role === "technician";
+  const canAddMachines = user?.role === "admin";
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -806,11 +807,11 @@ export default function OfficeOverview() {
               ) : (
                 <Eye className="w-3 h-3" />
               )}
-              {canEdit ? "Technician" : "Admin View"}
+              {user?.role === "technician" ? "Technician" : "Admin"}
             </Badge>
 
-            {/* Add Machine Button */}
-            {canEdit && (
+            {/* Add Machine Button - Admin Only */}
+            {canAddMachines && (
               <Button
                 onClick={() => setIsAddMachineModalOpen(true)}
                 className="gap-2"
@@ -1004,7 +1005,7 @@ export default function OfficeOverview() {
               <p className="text-muted-foreground mb-4">
                 No coffee machines are currently registered for {officeName}.
               </p>
-              {canEdit && (
+              {canAddMachines && (
                 <Button onClick={() => setIsAddMachineModalOpen(true)} className="gap-2">
                   <Plus className="w-4 h-4" />
                   Add First Machine
