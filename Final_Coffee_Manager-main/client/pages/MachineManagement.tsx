@@ -437,11 +437,13 @@ export default function MachineManagement({
         const localData = dataManager.getMachine(machineId);
         if (localData) {
           console.log('✅ Refreshing machine data from localStorage:', localData);
-          setMachineData(localData);
-          if (localData.alerts) {
-            setAlerts(localData.alerts);
-          }
-          return; // Don't override with API data if we have local updates
+        setMachineData(localData);
+        // Generate dynamic alerts based on machine condition
+        const dynamicAlerts = generateDynamicAlerts(localData);
+        const existingAlerts = localData.alerts || [];
+        const mergedAlerts = [...existingAlerts, ...dynamicAlerts];
+        setAlerts(mergedAlerts);
+        return; // Don't override with API data if we have local updates
         }
 
         // Only sync with API if no local data exists (for existing machines)
