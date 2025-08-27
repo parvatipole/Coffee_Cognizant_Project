@@ -113,20 +113,28 @@ export const dataManager = {
     }
   },
 
-  // Get machine by ID (checks shared storage first for latest updates)
+  // Get machine by ID (shared storage is the authoritative source)
   getMachine: (id: string): MachineData | null => {
-    // First check shared storage for the most recent updates (from other users)
+    // ALWAYS check shared storage first - this is the authoritative source for all updates
     const sharedMachine = dataManager.getMachineFromSharedStorage(id);
     if (sharedMachine) {
-      console.log(`🔍 DataManager: Found machine "${id}" in shared storage (latest updates)`);
+      console.log(`✅ DataManager: Found machine "${id}" in shared storage - status: ${sharedMachine.status}`);
       return sharedMachine;
     }
 
-    // Fallback to local storage if not found in shared storage
+    // If not in shared storage, check local storage (rare case)
     const machines = dataManager.getAllMachines();
-    const found = machines.find(m => m.id === id || m.machineId === id) || null;
-    console.log(`🔍 DataManager: Looking for machine with id/machineId "${id}". Found: ${found ? `${found.id} (${found.machineId})` : 'null'}`);
-    return found ? normalizeMachine(found) : null;
+    const localMachine = machines.find(m => m.id === id || m.machineId === id);
+    if (localMachine) {
+      const normalized = normalizeMachine(localMachine);
+      console.log(`📋 DataManager: Found machine "${id}" in local storage, will sync to shared storage`);
+      // Immediately sync to shared storage to maintain consistency
+      dataManager.syncToSharedStorage(normalized);
+      return normalized;
+    }
+
+    console.log(`❌ DataManager: Machine "${id}" not found in any storage`);
+    return null;
   },
 
   // Update machine supplies
