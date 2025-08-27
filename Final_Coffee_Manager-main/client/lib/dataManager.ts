@@ -118,7 +118,7 @@ export const dataManager = {
   updateMachineSupplies: (id: string, supplies: Partial<MachineData['supplies']>): void => {
     const machines = dataManager.getAllMachines();
     const machineIndex = machines.findIndex(m => m.id === id || m.machineId === id);
-    
+
     if (machineIndex !== -1) {
       const mergedSupplies = normalizeSupplies({
         ...machines[machineIndex].supplies,
@@ -126,6 +126,9 @@ export const dataManager = {
       });
       machines[machineIndex].supplies = mergedSupplies as any;
       localStorage.setItem(STORAGE_KEYS.MACHINES, JSON.stringify(machines));
+
+      // Also sync to shared storage for cross-user visibility
+      dataManager.syncToSharedStorage(machines[machineIndex]);
     }
   },
 
@@ -133,7 +136,7 @@ export const dataManager = {
   updateMachine: (id: string, updates: Partial<MachineData>): void => {
     const machines = dataManager.getAllMachines();
     const machineIndex = machines.findIndex(m => m.id === id || m.machineId === id);
-    
+
     if (machineIndex !== -1) {
       const updated = normalizeMachine({
         ...machines[machineIndex],
@@ -141,6 +144,9 @@ export const dataManager = {
       });
       machines[machineIndex] = updated;
       localStorage.setItem(STORAGE_KEYS.MACHINES, JSON.stringify(machines));
+
+      // Also sync to shared storage for cross-user visibility
+      dataManager.syncToSharedStorage(updated);
     }
   },
 
