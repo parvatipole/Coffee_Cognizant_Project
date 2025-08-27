@@ -216,6 +216,7 @@ export default function MachineManagement({
           location: "Hinjewadi IT Park - Building B1",
           status: "operational" as const,
           powerStatus: "online" as const,
+          electricityStatus: "available" as const,
           lastPowerUpdate: "2024-01-16 08:45",
           lastMaintenance: "2024-01-12",
           nextMaintenance: "2024-02-12",
