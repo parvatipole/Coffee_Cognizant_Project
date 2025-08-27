@@ -123,12 +123,12 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {},
   ): Promise<T> {
-    // In standalone mode, return mock data
+    // If explicitly in standalone mode, use mock data
     if (STANDALONE_MODE) {
       return this.handleStandaloneRequest<T>(endpoint, options);
     }
 
-    // Real API request for backend integration
+    // Try real API request first
     const url = `${this.baseURL}${endpoint}`;
     const token = tokenManager.getToken();
     const headers: HeadersInit = {
@@ -147,11 +147,19 @@ class ApiClient {
         signal: AbortSignal.timeout(10000), // 10 second timeout
       });
 
+      // Handle authentication errors
       if (response.status === 401) {
         tokenManager.removeToken();
         throw new Error("Authentication required");
       }
 
+      // Handle 501 Not Implemented - development server fallback
+      if (response.status === 501) {
+        console.log(`🔄 API endpoint ${endpoint} not implemented, using standalone mode`);
+        return this.handleStandaloneRequest<T>(endpoint, options);
+      }
+
+      // Handle other errors
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
@@ -162,12 +170,17 @@ class ApiClient {
 
       return await response.json();
     } catch (error) {
+      // Network errors - fallback to standalone mode
       if (error instanceof TypeError && error.message.includes("fetch")) {
-        throw new Error("Backend unavailable - check connection");
+        console.log(`🔄 Backend unavailable for ${endpoint}, using standalone mode`);
+        return this.handleStandaloneRequest<T>(endpoint, options);
       }
+
       if (error instanceof Error && error.name === "AbortError") {
-        throw new Error("Request timeout - please check your connection");
+        console.log(`⏱️ Request timeout for ${endpoint}, using standalone mode`);
+        return this.handleStandaloneRequest<T>(endpoint, options);
       }
+
       throw error;
     }
   }
