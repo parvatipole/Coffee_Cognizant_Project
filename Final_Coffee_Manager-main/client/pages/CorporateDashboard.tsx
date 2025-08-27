@@ -520,8 +520,8 @@ export default function CorporateDashboard() {
       // Load base corporate locations
       let loadedLocations = [...corporateLocations];
 
-      // Load machines from localStorage and merge them
-      const storedMachines = dataManager.getAllMachines();
+      // Load machines from shared storage (to see technician changes) and merge them
+      const storedMachines = dataManager.getAllMachinesFromSharedStorage();
 
       if (storedMachines.length > 0) {
         console.log(`Loaded ${storedMachines.length} machines from localStorage`);

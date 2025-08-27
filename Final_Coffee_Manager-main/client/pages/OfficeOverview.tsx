@@ -641,8 +641,8 @@ export default function OfficeOverview() {
   // Initialize machines on load
   React.useEffect(() => {
     const loadedMachines = getOfficeMachines();
-    // Also load any machines from localStorage for this office
-    const storedMachines = dataManager.getAllMachines().filter(m => m.office === officeName);
+    // Also load any machines from shared storage for this office (to see technician changes)
+    const storedMachines = dataManager.getAllMachinesFromSharedStorage().filter(m => m.office === officeName);
     const allMachines = [...loadedMachines];
 
     // Add stored machines that don't already exist
