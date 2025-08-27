@@ -256,7 +256,7 @@ export const dataManager = {
       const stored = localStorage.getItem(STORAGE_KEYS.SHARED_MACHINES);
       if (!stored) {
         // Initialize with demo data if shared storage is empty
-        console.log('📦 Initializing shared storage with demo machines');
+        console.log('📦 FIRST TIME: Initializing shared storage with demo machines for cross-user sync');
         const { generateDemoMachines } = require('@/config/machines');
         const demoMachines = generateDemoMachines();
         localStorage.setItem(STORAGE_KEYS.SHARED_MACHINES, JSON.stringify(demoMachines));
