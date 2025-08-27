@@ -147,6 +147,10 @@ export const dataManager = {
     return {
       ...backendData,
       supplies: normalizedSupplies,
+      // Ensure new fields have defaults
+      electricityStatus: backendData.electricityStatus || 'available',
+      recentRefills: backendData.recentRefills || [],
+      alerts: backendData.alerts || [],
     };
   },
 
