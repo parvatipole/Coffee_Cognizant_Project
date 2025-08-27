@@ -1141,13 +1141,16 @@ export default function MachineManagement({
               {canEdit && (
                 <Card
                   className="animate-fadeIn"
-                  style={{ animationDelay: "400ms" }}
+                  style={{ animationDelay: "500ms" }}
                 >
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Edit3 className="w-4 h-4" />
                       Technician Notes
                     </CardTitle>
+                    <CardDescription>
+                      Add maintenance notes, observations, or reminders
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
@@ -1162,16 +1165,6 @@ export default function MachineManagement({
                         placeholder="Add maintenance notes, observations, or reminders..."
                         className="min-h-[100px]"
                       />
-                      <div className="flex justify-end">
-                        <Button
-                          size="sm"
-                          onClick={handleSave}
-                          disabled={isLoading}
-                        >
-                          <Save className="w-3 h-3 mr-2" />
-                          {isLoading ? "Saving..." : "Save Notes"}
-                        </Button>
-                      </div>
                     </div>
                   </CardContent>
                 </Card>
