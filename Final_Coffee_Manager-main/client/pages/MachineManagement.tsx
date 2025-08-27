@@ -1278,53 +1278,67 @@ export default function MachineManagement({
                     <Calendar className="w-4 h-4" />
                     Recent Refills
                   </CardTitle>
+                  <CardDescription>
+                    {machineData.recentRefills?.length || 0} refill{(machineData.recentRefills?.length || 0) !== 1 ? 's' : ''} recorded
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
-                      <div>
-                        <div className="font-medium text-sm">Water Tank</div>
-                        <div className="text-xs text-muted-foreground">
-                          Refilled to 100%
-                        </div>
+                    {machineData.recentRefills && machineData.recentRefills.length > 0 ? (
+                      machineData.recentRefills.map((refill, index) => {
+                        const formatTimeAgo = (timestamp: string) => {
+                          const now = new Date();
+                          const refillTime = new Date(timestamp);
+                          const diffMs = now.getTime() - refillTime.getTime();
+                          const diffMins = Math.floor(diffMs / (1000 * 60));
+                          const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                          const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+                          if (diffMins < 1) return 'Just now';
+                          if (diffMins < 60) return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
+                          if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+                          return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+                        };
+
+                        const getBgColor = (supplyType: string) => {
+                          switch (supplyType) {
+                            case 'water': return 'bg-blue-50 border-blue-200';
+                            case 'milk': return 'bg-purple-50 border-purple-200';
+                            case 'coffeeBeans': return 'bg-amber-50 border-amber-200';
+                            case 'sugar': return 'bg-pink-50 border-pink-200';
+                            default: return 'bg-gray-50 border-gray-200';
+                          }
+                        };
+
+                        return (
+                          <div
+                            key={refill.id}
+                            className={`flex items-center justify-between p-3 rounded-lg border ${getBgColor(refill.supplyType)}`}
+                          >
+                            <div>
+                              <div className="font-medium text-sm">{refill.supplyName}</div>
+                              <div className="text-xs text-muted-foreground">
+                                Refilled to {refill.amount}% (+{refill.refillAmount}%)
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-xs font-medium">{formatTimeAgo(refill.timestamp)}</div>
+                              <div className="text-xs text-muted-foreground">
+                                by {refill.technician}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="text-center py-8">
+                        <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium">No Recent Refills</h3>
+                        <p className="text-muted-foreground">
+                          Refill activities will appear here after supplies are refilled.
+                        </p>
                       </div>
-                      <div className="text-right">
-                        <div className="text-xs font-medium">2 hours ago</div>
-                        <div className="text-xs text-muted-foreground">
-                          by {user?.name}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
-                      <div>
-                        <div className="font-medium text-sm">
-                          Coffee Beans
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          Refilled to 90%
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-xs font-medium">Yesterday</div>
-                        <div className="text-xs text-muted-foreground">
-                          by Tech Support
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-200">
-                      <div>
-                        <div className="font-medium text-sm">Sugar</div>
-                        <div className="text-xs text-muted-foreground">
-                          Refilled to 95%
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-xs font-medium">3 days ago</div>
-                        <div className="text-xs text-muted-foreground">
-                          by John Tech
-                        </div>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
