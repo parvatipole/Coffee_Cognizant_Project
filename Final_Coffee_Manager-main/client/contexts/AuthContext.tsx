@@ -3,6 +3,7 @@ import { apiClient, tokenManager } from "@/lib/api";
 import { initializeMQTT } from "@/lib/mqtt";
 import { USER_ROLES, DEMO_CREDENTIALS } from "@/config";
 import { generateDemoUsers } from "@/config/machines";
+import { dataManager } from "@/lib/dataManager";
 
 export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
 
@@ -68,7 +69,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       // Ensure shared storage is initialized for cross-user data visibility
       try {
-        const { dataManager } = await import('@/lib/dataManager');
         dataManager.getAllMachinesFromSharedStorage(); // This initializes shared storage if empty
         console.log('✅ AUTH: Shared storage initialized on login');
       } catch (error) {
@@ -122,7 +122,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         // Ensure shared storage is initialized for cross-user data visibility
         try {
-          const { dataManager } = await import('@/lib/dataManager');
           dataManager.getAllMachinesFromSharedStorage(); // This initializes shared storage if empty
           console.log('✅ LOGIN: Shared storage initialized for cross-user sync');
         } catch (error) {
@@ -181,7 +180,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       // Ensure shared storage is initialized for cross-user data visibility
       try {
-        const { dataManager } = await import('@/lib/dataManager');
         dataManager.getAllMachinesFromSharedStorage(); // This initializes shared storage if empty
         console.log('✅ DEMO LOGIN: Shared storage initialized for cross-user sync');
       } catch (error) {
