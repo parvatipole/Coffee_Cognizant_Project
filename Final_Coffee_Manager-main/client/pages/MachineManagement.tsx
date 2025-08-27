@@ -409,67 +409,64 @@ export default function MachineManagement({
     return result as MachineData;
   };
 
-  const [machineData, setMachineData] = useState<MachineData>(() => {
-    // If machineId is provided, get specific machine
-    if (machineId) {
-      // First check localStorage for saved/updated data
-      const localMachine = dataManager.getMachine(machineId);
-      if (localMachine) {
-        console.log('🎯 Using localStorage machine data:', localMachine);
-        return localMachine;
-      }
+  const [machineData, setMachineData] = useState<MachineData | null>(null);
 
-      // Fallback to static data
-      const machine = getMachineDataById(machineId);
-      if (machine) return machine;
-    }
-    // Otherwise, get office machine data (legacy behavior)
-    return getOfficeMachineData();
-  });
-
-  // Load machine data from API/localStorage on component mount
+  // Load machine data from dataManager (shared storage first, then fallback)
   useEffect(() => {
     const loadMachineData = async () => {
-      if (!machineId) return;
+      if (!machineId) {
+        // Legacy behavior for when no machineId is provided
+        const officeData = getOfficeMachineData();
+        setMachineData(officeData);
+        return;
+      }
 
       try {
-        // First try to load from localStorage (this has priority)
-        const localData = dataManager.getMachine(machineId);
-        if (localData) {
-          console.log('✅ Refreshing machine data from localStorage:', localData);
-        setMachineData(localData);
-        // Generate dynamic alerts based on machine condition
-        const dynamicAlerts = generateDynamicAlerts(localData);
-        const existingAlerts = localData.alerts || [];
-        const mergedAlerts = [...existingAlerts, ...dynamicAlerts];
-        setAlerts(mergedAlerts);
-        return; // Don't override with API data if we have local updates
+        // PRIORITY 1: Check shared storage (includes all technician updates)
+        let machineData = dataManager.getMachine(machineId);
+
+        if (machineData) {
+          console.log('✅ MACHINE DETAIL: Loaded machine from storage:', machineData.id, 'status:', machineData.status);
+        } else {
+          // PRIORITY 2: Try to load from API (for new machines not yet in storage)
+          try {
+            const apiData = await apiClient.getMachineByMachineId(machineId);
+            if (apiData) {
+              machineData = dataManager.mapBackendToFrontend(apiData);
+              console.log('📡 MACHINE DETAIL: Loaded machine from API:', machineData);
+              // Save to storage for future consistency
+              dataManager.saveMachine(machineData);
+            }
+          } catch (apiError) {
+            console.log('API unavailable, trying static fallback:', apiError.message);
+          }
+
+          // PRIORITY 3: Fallback to static data (only if nothing else works)
+          if (!machineData) {
+            machineData = getMachineDataById(machineId);
+            if (machineData) {
+              console.log('💾 MACHINE DETAIL: Using static fallback data for:', machineId);
+              // Save static data to storage for future consistency
+              dataManager.saveMachine(machineData);
+            }
+          }
         }
 
-        // Only sync with API if no local data exists (for existing machines)
-        try {
-          const apiData = await apiClient.getMachineByMachineId(machineId);
-          if (apiData) {
-            const mappedData = dataManager.mapBackendToFrontend(apiData);
-            console.log('📡 Loaded machine data from API:', mappedData);
-            setMachineData(mappedData);
-            dataManager.saveMachine(mappedData);
-
-            // Generate dynamic alerts and merge with API alerts
-            const dynamicAlerts = generateDynamicAlerts(mappedData);
-            const apiAlerts = apiData.alerts || [];
-            const mergedAlerts = [...apiAlerts, ...dynamicAlerts];
-            setAlerts(mergedAlerts);
-          }
-        } catch (apiError) {
-          console.log('API unavailable, using existing data:', apiError.message);
+        if (machineData) {
+          setMachineData(machineData);
+          // Generate dynamic alerts based on machine condition
+          const dynamicAlerts = generateDynamicAlerts(machineData);
+          const existingAlerts = machineData.alerts || [];
+          const mergedAlerts = [...existingAlerts, ...dynamicAlerts];
+          setAlerts(mergedAlerts);
+        } else {
+          console.error('MACHINE DETAIL: Could not load machine data for:', machineId);
         }
       } catch (error) {
-        console.error("Failed to load machine data:", error);
+        console.error("MACHINE DETAIL: Failed to load machine data:", error);
       }
     };
 
-    // Reload data when machineId changes
     loadMachineData();
   }, [machineId]);
 
