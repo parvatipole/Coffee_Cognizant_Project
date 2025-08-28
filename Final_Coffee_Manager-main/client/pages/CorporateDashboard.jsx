@@ -474,10 +474,24 @@ export default function CorporateDashboard() {
       if (storedMachines.length > 0) {
         console.log(`✅ ADMIN VIEW: Loaded ${storedMachines.length} machines from shared storage (cross-user sync enabled)`);
 
+        const toDashboardMachine = (m) => ({
+          ...m,
+          performance: m.performance || {
+            dailyCups: m?.usage?.dailyCups ?? 0,
+            efficiency: 100,
+            supplies: {
+              water: m?.supplies?.water ?? 0,
+              milk: m?.supplies?.milk ?? 0,
+              coffee: (m?.supplies?.coffee ?? m?.supplies?.coffeeBeans) ?? 0,
+              sugar: m?.supplies?.sugar ?? 0,
+            },
+          },
+        });
+
         const machinesByOffice = storedMachines.reduce((acc, machine) => {
           const office = machine.office || 'Unknown Office';
           if (!acc[office]) acc[office] = [];
-          acc[office].push(machine);
+          acc[office].push(toDashboardMachine(machine));
           return acc;
         }, {});
 
@@ -489,13 +503,14 @@ export default function CorporateDashboard() {
             let updatedMachines = [...office.machines];
 
             storedMachinesForOffice.forEach(storedMachine => {
-              const existingIndex = updatedMachines.findIndex(m => m.id === storedMachine.id);
+              const enriched = toDashboardMachine(storedMachine);
+              const existingIndex = updatedMachines.findIndex(m => m.id === enriched.id);
               if (existingIndex !== -1) {
-                updatedMachines[existingIndex] = storedMachine;
-                console.log(`🔄 ADMIN: Updated machine ${storedMachine.id} status to ${storedMachine.status}`);
+                updatedMachines[existingIndex] = enriched;
+                console.log(`🔄 ADMIN: Updated machine ${enriched.id} status to ${enriched.status}`);
               } else {
-                updatedMachines.push(storedMachine);
-                console.log(`➕ ADMIN: Added new machine ${storedMachine.id}`);
+                updatedMachines.push(enriched);
+                console.log(`➕ ADMIN: Added new machine ${enriched.id}`);
               }
             });
 
@@ -1174,7 +1189,7 @@ export default function CorporateDashboard() {
                       <div className="grid grid-cols-2 gap-3">
                         <div className="text-center p-2 bg-gray-50 rounded">
                           <div className="text-lg font-bold text-blue-600">
-                            {machine.performance.dailyCups}
+                            {machine.performance?.dailyCups ?? machine.usage?.dailyCups ?? 0}
                           </div>
                           <div className="text-xs text-muted-foreground">
                             Daily Cups
@@ -1193,12 +1208,12 @@ export default function CorporateDashboard() {
                             </span>
                             <span
                               className={
-                                machine.performance.supplies.water > 50
+                                (machine.performance?.supplies?.water ?? machine.supplies?.water ?? 0) > 50
                                   ? "text-green-600"
                                   : "text-red-500"
                               }
                             >
-                              {machine.performance.supplies.water}%
+                              {(machine.performance?.supplies?.water ?? machine.supplies?.water ?? 0)}%
                             </span>
                           </div>
                           <div className="flex items-center justify-between">
@@ -1208,36 +1223,36 @@ export default function CorporateDashboard() {
                             </span>
                             <span
                               className={
-                                machine.performance.supplies.coffee > 50
+                                (machine.performance?.supplies?.coffee ?? machine.supplies?.coffee ?? machine.supplies?.coffeeBeans ?? 0) > 50
                                   ? "text-green-600"
                                   : "text-red-500"
                               }
                             >
-                              {machine.performance.supplies.coffee}%
+                              {(machine.performance?.supplies?.coffee ?? machine.supplies?.coffee ?? machine.supplies?.coffeeBeans ?? 0)}%
                             </span>
                           </div>
                           <div className="flex items-center justify-between">
                             <span>Milk</span>
                             <span
                               className={
-                                machine.performance.supplies.milk > 50
+                                (machine.performance?.supplies?.milk ?? machine.supplies?.milk ?? 0) > 50
                                   ? "text-green-600"
                                   : "text-red-500"
                               }
                             >
-                              {machine.performance.supplies.milk}%
+                              {(machine.performance?.supplies?.milk ?? machine.supplies?.milk ?? 0)}%
                             </span>
                           </div>
                           <div className="flex items-center justify-between">
                             <span>Sugar</span>
                             <span
                               className={
-                                machine.performance.supplies.sugar > 50
+                                (machine.performance?.supplies?.sugar ?? machine.supplies?.sugar ?? 0) > 50
                                   ? "text-green-600"
                                   : "text-red-500"
                               }
                             >
-                              {machine.performance.supplies.sugar}%
+                              {(machine.performance?.supplies?.sugar ?? machine.supplies?.sugar ?? 0)}%
                             </span>
                           </div>
                         </div>
@@ -1250,11 +1265,11 @@ export default function CorporateDashboard() {
                             Efficiency
                           </span>
                           <span className="text-sm font-bold text-purple-600">
-                            {machine.performance.efficiency}%
+                            {machine.performance?.efficiency ?? 100}%
                           </span>
                         </div>
                         <Progress
-                          value={machine.performance.efficiency}
+                          value={machine.performance?.efficiency ?? 100}
                           className="h-2"
                         />
                       </div>
