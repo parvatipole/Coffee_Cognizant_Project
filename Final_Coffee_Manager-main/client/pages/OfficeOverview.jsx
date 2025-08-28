@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from "react";
-import React, { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
