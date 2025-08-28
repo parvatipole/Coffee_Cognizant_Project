@@ -10,7 +10,7 @@ import { pathToOfficeName } from "@/lib/officeRouting";
 import InteractiveBreadcrumb from "@/components/InteractiveBreadcrumb";
 import AddMachineModal from "@/components/AddMachineModal";
 import { dataManager } from "@/lib/dataManager";
-aimport { apiClient } from "@/lib/api";
+import { apiClient } from "@/lib/api";
 
 export default function OfficeOverview() {
   const { officePath } = useParams();
