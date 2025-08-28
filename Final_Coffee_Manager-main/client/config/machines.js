@@ -158,7 +158,7 @@ export const generateDemoUsers = () => {
       id: `tech-${String(index + 1).padStart(3, '0')}`,
       username: `tech${index + 1}`,
       role: "technician",
-      name: `${office.name} Technician",
+      name: `${office.name} Technician`,
       city: office.city,
       officeName: office.name,
     });
