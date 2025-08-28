@@ -280,6 +280,11 @@ export const dataManager = {
 
       const machines = sharedMachines.map(normalizeMachine);
 
+      // Ensure storage is updated with normalized shape (backfill usage/supplies)
+      try {
+        localStorage.setItem(STORAGE_KEYS.SHARED_MACHINES, JSON.stringify(machines));
+      } catch {}
+
       console.log(`📊 SHARED STORAGE: Loaded ${machines.length} machines`);
       machines.forEach(m => {
         console.log(`  - ${m.id}: ${m.status} (power: ${m.powerStatus}, electricity: ${m.electricityStatus || 'N/A'})`);
