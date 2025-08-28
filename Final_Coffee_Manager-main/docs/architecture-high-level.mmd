@@ -1,0 +1,58 @@
+flowchart TD
+  %% High-level Architecture Diagram for Coffee Manager
+  %% Frontend SPA in Browser
+  subgraph Client[Client (Browser)]
+    direction TB
+    UI["UI Layer\nReact 18 + React Router 6\nTailwindCSS + Radix UI + Lucide"]
+    State["State & Storage\nReact Hooks + LocalStorage"]
+    API["API Client\nfetch + zod validation\nAutomatic fallback to mock/localStorage"]
+    DataMgr["Data Manager\nLocalStorage persistence\nSync when backend available"]
+    Assets["Static Assets\npublic/ (icons, images)"]
+    UI --> API
+    UI <--> State
+    State <--> DataMgr
+    UI --> Assets
+    API <--> DataMgr
+  end
+
+  subgraph DevServer[Dev Server (Local Dev)]
+    direction TB
+    Vite["Vite Dev Server\nHMR, static serving"]
+    Express["API Stubs (server/index.ts)\nRoute skeletons for /api/*"]
+    Vite --> Express
+  end
+
+  subgraph Backend[Backend Integration (When available)]
+    direction TB
+    APIImpl["REST API Endpoints\n/api/auth/*, /api/machines/*"]
+    DB[("Database\n(Postgres/Neon)")]
+    Auth["Authentication"]
+    Services["External Services (optional)\nMonitoring/Analytics"]
+    APIImpl --> DB
+    APIImpl --> Auth
+    APIImpl --> Services
+  end
+
+  subgraph BuildDeploy[Build & Deployment]
+    direction TB
+    Build["Build: vite build -> dist/"]
+    Preview["Preview: vite preview / npm start"]
+    Hosting["CDN/Hosting\nStatic files + API origin"]
+    Build --> Preview --> Hosting
+  end
+
+  %% Data/Request Flows
+  User([User]) --> UI
+  API -- "/api/* during dev" --> Express
+  API -- "/api/* in prod" --> APIImpl
+  API -. "fallback when backend unavailable" .-> DataMgr
+  Vite --> UI
+  Hosting --> UI
+
+  %% Monitoring paths (optional)
+  subgraph Realtime[Realtime (optional)]
+    direction TB
+    MQTT["MQTT/WebSocket (lib/mqtt.ts)"]
+  end
+  MQTT -.events.-> UI
+  MQTT -.updates.-> State
