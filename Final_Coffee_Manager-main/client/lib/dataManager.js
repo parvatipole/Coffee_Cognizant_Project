@@ -21,6 +21,10 @@ const normalizeMachine = (machine) => {
   return {
     ...machine,
     supplies: normalizeSupplies(machine.supplies || {}),
+    usage: {
+      dailyCups: machine?.usage?.dailyCups ?? 0,
+      weeklyCups: machine?.usage?.weeklyCups ?? 0,
+    },
   };
 };
 
