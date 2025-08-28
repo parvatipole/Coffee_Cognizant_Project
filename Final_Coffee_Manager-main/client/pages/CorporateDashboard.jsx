@@ -1044,6 +1044,33 @@ export default function CorporateDashboard() {
           {/* Step 3: Machine Analytics */}
           {currentStep === 2 && selectedOffice && (
             <div className="space-y-6">
+              {/* Back actions */}
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setSelectedMachine("");
+                    setCurrentStep(1);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  className="gap-2"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Back to Offices
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setSelectedMachine("");
+                    setSelectedOffice("");
+                    setCurrentStep(0);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  className="gap-2"
+                >
+                  <MapPin className="w-4 h-4" /> Back to Locations
+                </Button>
+              </div>
+
               {/* Office Performance Dashboard */}
               <Card className="shadow-xl border-0 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
                 <CardHeader>
