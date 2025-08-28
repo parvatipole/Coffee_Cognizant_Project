@@ -153,8 +153,8 @@ export default function OfficeOverview() {
                   </div>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <div className="text-center"><div className="font-semibold text-lg">{machine.usage.dailyCups}</div><div className="text-muted-foreground text-xs">Today</div></div>
-                  <div className="text-center"><div className="font-semibold text-lg">{machine.usage.weeklyCups}</div><div className="text-muted-foreground text-xs">This Week</div></div>
+                  <div className="text-center"><div className="font-semibold text-lg">{machine?.usage?.dailyCups ?? 0}</div><div className="text-muted-foreground text-xs">Today</div></div>
+                  <div className="text-center"><div className="font-semibold text-lg">{machine?.usage?.weeklyCups ?? 0}</div><div className="text-muted-foreground text-xs">This Week</div></div>
                 </div>
                 <Link to={`/machine/${machine.id}`}>
                   <Button className="w-full" variant={canEdit ? "default" : "outline"}>
