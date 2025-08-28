@@ -17,8 +17,7 @@
     "preview": "vite preview",
     "start": "vite preview --port 3000",
     "test": "vitest --run",
-    "format.fix": "prettier --write .",
-    "typecheck": "tsc"
+    "format.fix": "prettier --write ."
   },
   "dependencies": {
     "dotenv": "^17.2.0",
