@@ -28,25 +28,47 @@ export const tokenManager = {
 const SHARED_MACHINES_KEY = STORAGE_KEYS.SHARED_MACHINES;
 const getDefaultMachineData = () => generateDemoMachines();
 
+// Local normalizers to avoid circular imports
+const normalizeSupplies = (supplies = {}) => {
+  const coffeeLevel = supplies.coffeeBeans ?? supplies.coffee ?? 0;
+  return {
+    water: supplies.water ?? 0,
+    milk: supplies.milk ?? 0,
+    sugar: supplies.sugar ?? 0,
+    coffeeBeans: coffeeLevel,
+    coffee: coffeeLevel,
+  };
+};
+const normalizeMachine = (m) => ({
+  ...m,
+  supplies: normalizeSupplies(m?.supplies || {}),
+  usage: {
+    dailyCups: m?.usage?.dailyCups ?? 0,
+    weeklyCups: m?.usage?.weeklyCups ?? 0,
+  },
+});
+
 const sharedDataManager = {
   getMachines: () => {
     try {
       const stored = localStorage.getItem(SHARED_MACHINES_KEY);
       if (!stored) {
-        const defaultData = getDefaultMachineData();
+        const defaultData = getDefaultMachineData().map(normalizeMachine);
         console.log('🔧 Initializing shared machine data for standalone mode');
         localStorage.setItem(SHARED_MACHINES_KEY, JSON.stringify(defaultData));
         return defaultData;
       }
-      return JSON.parse(stored);
+      const parsed = JSON.parse(stored);
+      return Array.isArray(parsed) ? parsed.map(normalizeMachine) : [];
     } catch (error) {
       console.warn('Failed to load shared machines data:', error);
-      return getDefaultMachineData();
+      return getDefaultMachineData().map(normalizeMachine);
     }
   },
   saveMachines: (machines) => {
     try {
-      localStorage.setItem(SHARED_MACHINES_KEY, JSON.stringify(machines));
+      const normalized = (machines || []).map(normalizeMachine);
+      localStorage.setItem(SHARED_MACHINES_KEY, JSON.stringify(normalized));
       console.log('💾 Shared data: Saved machines to shared storage');
     } catch (error) {
       console.error('Failed to save machines to shared storage:', error);
@@ -56,7 +78,7 @@ const sharedDataManager = {
     const machines = sharedDataManager.getMachines();
     const machineIndex = machines.findIndex((m) => m.id === id || m.machineId === id);
     if (machineIndex !== -1) {
-      machines[machineIndex] = { ...machines[machineIndex], ...updateData };
+      machines[machineIndex] = normalizeMachine({ ...machines[machineIndex], ...updateData });
       sharedDataManager.saveMachines(machines);
       console.log(`💾 Shared data: Updated machine ${id} in shared storage`);
       return machines[machineIndex];
@@ -67,7 +89,8 @@ const sharedDataManager = {
     const machines = sharedDataManager.getMachines();
     const machineIndex = machines.findIndex((m) => m.id === id || m.machineId === id);
     if (machineIndex !== -1) {
-      machines[machineIndex].supplies = { ...machines[machineIndex].supplies, ...supplies };
+      machines[machineIndex].supplies = normalizeSupplies({ ...machines[machineIndex].supplies, ...supplies });
+      machines[machineIndex] = normalizeMachine(machines[machineIndex]);
       sharedDataManager.saveMachines(machines);
       console.log(`💾 Shared data: Updated supplies for machine ${id} in shared storage`);
       return machines[machineIndex];
